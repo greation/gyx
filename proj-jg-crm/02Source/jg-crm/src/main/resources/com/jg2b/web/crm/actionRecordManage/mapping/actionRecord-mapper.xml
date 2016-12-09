@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.jg2b.api.crm.actionRecord.dao.IActionRecordDao">
+ <!-- 根据用户名称查询所属行动记录 -->
+<select id="queryActionByCsname" resultType="com.jg2b.api.crm.actionRecord.pojo.ActionRecordPojo">
+	<![CDATA[
+	   SELECT S.ID AS id,
+			  S.Owner AS OWNER,
+			  S.Recepter AS recepter,
+			  S.rcptTitle AS rcptTitle,
+			  S.RcptPhone AS rcptPhone,
+			  S.Method AS method ,
+			  S.Content AS content,
+			  S.BeginTime AS beginTime,
+			  S.EndTime AS endTime,
+			  S.Address AS address,
+			  S.CSName AS csName,
+			  S.Results AS results,
+			  S.CreateTime AS createTime,
+			  S.Description AS desription,
+			  S.Deleted AS deleted
+			  FROM T_CRM_ServiceNotes S INNER JOIN T_CRM_Customers C ON S.Owner=C.ID  WHERE C.Name=#{csName}]]>
+</select>
+<!--根据ID逻辑删除行动记录表 -->
+   <update id="deleActionRecord" parameterType="String"  >
+     UPDATE T_CRM_ServiceNotes s SET s.Deleted=1  WHERE s.ID=#{id}
+   </update>
+   
+   <!--新增行动记录  -->
+<insert id="saveActionRecords" useGeneratedKeys="true" keyProperty="ID" parameterType="com.jg2b.api.crm.actionRecord.pojo.ActionRecordPojo">
+	<![CDATA[INSERT INTO T_CRM_ServiceNotes(GID,OWNER,Recepter,RcptTitle,RcptPhone,Method,Content,BeginTime,EndTime,Results,CreateTime,Description,Deleted,CSID)
+        VALUES(
+        #{GID},
+        #{owners},
+        #{recepter},
+        #{rcptTitle},
+        #{rcptPhone},
+        #{method},
+        #{content},
+        #{beginTime},
+        #{endTime},
+        #{results},
+        #{createTime},
+        #{desription},
+        #{deleted},
+        #{csID})]]>
+</insert> 
+<!-- 根据客户名称查询客户表 -->
+<select id="isCustomer" resultType="com.jg2b.api.crm.actionRecord.pojo.CustomerPojo">
+	<![CDATA[ SELECT c.ID AS id ,
+						c.Name AS NAME,
+						c.CustType AS custType,
+						c.Credits AS credits,
+						c.Actives AS actives,
+						c.Classification AS classification,
+						 c.Level AS LEVEL,
+						 c.Faxes  AS faxes,
+						 c.Introduce AS introduce,
+						 c.UpdateTime AS updateTime,
+						 c.Creater AS creater,
+						 c.CreateTime AS createtime, 
+						 c.Modifer AS modifer,
+						 c.Owner AS OWNER ,
+						 c.Signer AS signer,
+						 c.SignTime AS signTime,
+						  c.Auditer AS auditer,
+						  c.AuditTime AS AuditTime,
+						  c.Description AS description,
+                        c.Deleted AS deleted  
+                        FROM  T_CRM_Customers c WHERE c.Name=#{cusName} limit 1]]>
+</select>
+<!--根据公司名称和时间段查询行动记录实体集合  -->
+<select id="queryActionByOwnerAndTime" resultType="com.jg2b.api.crm.actionRecord.pojo.ActionRecordPojo">
+	<![CDATA[ SELECT * FROM T_CRM_ServiceNotes s INNER JOIN T_CRM_Customers c ON s.Owner=c.ID 
+		WHERE c.Name=#{cusName}
+		AND  s.CreateTime >=#{beginTime}
+		AND s.CreateTime <=#{endTime}]]>
+</select>
+<!-- 根据公司名称和联系人名称查询电话号码 -->
+<select id="queryPhoneNoByCusNameandTname"  resultType="com.jg2b.api.crm.actionRecord.pojo.ActionRecordPojo" >
+	SELECT c.GID AS owners, t.Telphone AS rcptPhone,t.ID AS rcpCid FROM T_CRM_Contacts t
+       INNER JOIN T_CRM_Customers c
+       ON t.Owner=c.ID
+       WHERE c.ID=#{0}
+       AND t.Name=#{1}
+</select>
+
+<!-- 根据公司名称id查询联系人 电话号码 -->
+<select id="queryContactsListByOwer"  parameterType="Integer"  resultType="com.jg2b.api.crm.actionRecord.pojo.ActionRecordPojo" >
+	 SELECT  s.Position AS position , s.Name AS recepter,s.Telphone AS rcptPhone FROM T_CRM_Customers c INNER JOIN T_CRM_Contacts s ON c.GID=s.Owner WHERE c.ID=#{id}
+</select>
+    
+
+<!-- 查询行动记录详情 -->
+<select id="queryActionRecodDetail"  parameterType="Integer"  resultType="com.jg2b.api.crm.actionRecord.doman.ActionRecordDoman" >
+ <![CDATA[SELECT s.ID AS id,
+                s.GID AS gid,
+				c.Name AS cusName,
+				c.ID AS cusId,
+				s.Recepter AS recepter,
+				s.RcptTitle AS rcptTitle,
+				s.RcptPhone AS rcptPhone,
+				s.Method AS method,
+				s.Content AS Content,
+				s.BeginTime AS BeginTime,
+				s.EndTime AS endTime,
+				s.Results AS results,
+				s.CreateTime AS createTime,
+				s.Description AS desription,
+				s.Owner  AS custId,
+				u.Name AS csName,
+				a.address AS address
+				FROM T_CRM_ServiceNotes s 
+				LEFT JOIN T_CRM_Customers   c ON s.Owner=c.GID                           
+				LEFT JOIN T_CRM_Contacts t ON s.CSID=t.GID 
+				LEFT JOIN T_Common_Address a ON  s.GID=a.SubscriberID  
+				LEFT JOIN   T_Auth_Users  u  ON s.CSID=u.GID                        
+				WHERE s.ID=#{id}]]>
+</select>
+<insert id="saveAttachments" useGeneratedKeys="true" parameterType="com.jg2b.common.pojo.AttachmentPojo" keyProperty="ID" >
+   <![CDATA[INSERT  INTO T_Common_Attachments(GID,AttaType,SubscriberType,SubscriberID,`GROUP`,PrimitiveName,StorageName,StoragePath,Extensions,Bytes,CheckNo,Algorithm,Deleted,CreateTime)VALUES
+					(
+					#{GID},
+					#{attaType},
+					#{subScriberType},
+					#{subScriberID},
+					#{group},
+					#{primitiveName},
+					#{storageName},
+					#{storagePath},
+					#{extensions},
+					#{bytes},
+					#{checkNo},
+					#{algorithm},
+					#{deleted},
+					#{createTime})]]>
+</insert>
+<insert id="saveMediaAttachs" parameterType="com.jg2b.common.pojo.MediaAttachsPojo">
+<![CDATA[INSERT  INTO T_Common_MediaAttachs(GID,Width,Height,CreateTime)VALUES
+			(
+			#{GID},
+			#{width},
+			#{height},
+			#{createTime})]]>
+</insert>
+<insert id="saveStreamAttachs"  parameterType="com.jg2b.common.pojo.StreamAttachsPojo">
+<![CDATA[INSERT  INTO T_Common_StreamAttachs(GID,LENGTH,Frames,Encoder,CreateTime)VALUES
+		(#{GID},
+		#{length},
+		#{frames},
+		#{encoder},
+		#{createTime})]]>	
+		</insert>
+<!-- 根据订阅者id（行动记录id）查询图片 -->
+<select id="queryAttachmentPojoById"  parameterType="String" resultType="com.jg2b.api.crm.actionRecord.dto.AttachmentDto" >
+	 SELECT a.ID AS ID, 
+            a.StorageName AS storageName ,
+			a.StoragePath AS storagePath ,
+			a.Extensions AS extensions 
+			FROM T_Common_Attachments a 
+			WHERE a.SubscriberID=#{subID}
+			AND a.Deleted=0
+</select>
+<!-- 根据用户id查询所有公司名称  -->
+<select id="queryCustomer"   resultType="com.jg2b.api.crm.actionRecord.pojo.CustomerPojo" >
+SELECT c.GID,c.ID,c.Name FROM T_Auth_Users u INNER JOIN T_CRM_Customers c ON u.GID=c.Owner WHERE u.ID=#{id} and c.Deleted=0 ORDER BY c.name
+</select>
+<!--新增客户活动记录 -->
+   <update id="updateCustomerActive">
+    	 UPDATE T_CRM_Customers t SET t.Actives=IFNULL(t.Actives,0)+(#{0})  WHERE t.ID=#{1}
+   </update>
+   <!-- 插入地址记录 -->
+<insert id="saveAddress"  parameterType="com.jg2b.api.crm.contactInfo.pojo.AddressPojo"  >
+	INSERT INTO T_Common_Address(GID,OWNER,SubscriberType,SubscriberID,CreateTime,Deleted,Name,Address) VALUES
+		(#{GID},
+		#{owner},
+		#{subscriberType},
+		#{subscriberID},
+		#{createTime},
+		#{deleted},
+		#{name},
+		#{address})
+</insert>
+
+<!-- 根据附件id更新地址记录 -->
+<insert id="updateAddress"  parameterType="com.jg2b.api.crm.contactInfo.pojo.AddressPojo"  >
+	UPDATE T_Common_Address SET 
+	 <if test="address != null and address !='' ">
+	          Address=#{address}
+	 </if>
+     WHERE SubscriberID=#{subscriberID}
+</insert>
+<!-- 根据客户id查询gid -->
+<select id="queryGidbyCusid"  parameterType="Integer" resultType="String" >
+	 SELECT c.GID  FROM T_CRM_Customers c WHERE c.ID=#{id}
+</select>
+<!-- 客户详情页面跳转到新增行动记录页面 -->
+<select id="jumpAddActionJspByCusDetailId"  parameterType="Integer" resultType="com.jg2b.api.crm.actionRecord.doman.ActionRecordDoman" >
+	SELECT c.Name AS cusName,c.ID AS custId FROM T_CRM_Customers c WHERE c.ID=#{id}
+</select>
+<!--更行行动记录-->
+<update id="updateActionRecord" parameterType="com.jg2b.api.crm.actionRecord.pojo.ActionRecordPojo">
+UPDATE T_CRM_ServiceNotes SET
+                                   <if test="owners != null and owners !='' ">
+			                        OWNER=#{owners},
+		                            </if>
+		                            <if test="rcpCid != null and rcpCid !='' ">
+			                        RcptID=#{rcpCid},
+		                            </if>
+		                            <if test="recepter != null and recepter !='' ">
+			                        Recepter=#{recepter},
+		                            </if>
+		                            <if test="rcptTitle != null and rcptTitle !='' ">
+                                       RcptTitle=#{rcptTitle},
+		                            </if>
+		                            <if test="rcptPhone != null and rcptPhone !='' ">
+                                        RcptPhone=#{rcptPhone},
+		                            </if>
+                                     <if test="method != null ">
+                                        Method=#{method},
+		                            </if>   
+                                     <if test="content != null and content !='' ">
+                                         Content=#{content},
+		                            </if>  
+                                     <if test="beginTime != null and beginTime !='' ">
+                                         BeginTime=#{beginTime},
+		                            </if>
+                                     <if test="address != null and address !='' ">
+                                         Address=#{address},
+		                            </if>   
+                           
+                                     <if test="results != null and results !='' ">
+                                        Results=#{results},
+		                            </if>
+		                            <if test="csID != null and csID !='' ">
+                                        CSID=#{csID},
+		                            </if>
+                                       Description=#{desription},
+		                            <if test="endTime != null and endTime !='' ">
+                                         EndTime=#{endTime}
+		                            </if>		                            
+                                      WHERE ID=#{ID} 
+</update>
+
+<!-- 根据行动记录id查询gid -->
+<select id="queryRgidByRid"  parameterType="Integer" resultType="String" >
+	SELECT GID FROM  T_CRM_ServiceNotes WHERE ID=#{id}
+</select>
+<!-- 根据行动记录gid删除图片 -->
+<update id="updateAttachment" parameterType="String">
+	update T_Common_Attachments 
+		set
+		Deleted = 1
+		where SubscriberID=#{subID}
+</update>
+<update id="deleteAttachment" parameterType="int">
+
+	update T_Common_Attachments
+		set
+		Deleted = 1
+		where ID = #{attId}
+</update>
+  
+</mapper>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.jg2b.h5.dao.CircleDao">
+	<!-- 根据电话号码查询得到一个用户信息 -->
+	<select id="queryCircleInfo"  resultType="com.jg2b.h5.dto.CircleDto">
+SELECT
+	id,
+	title,
+	province,
+	city,
+	AREA,
+	address,
+	today_companys,
+	companys,
+	today_products,
+	products,
+	pic,
+	add_time,
+	short_title,
+	product_time,
+	(SELECT region_name FROM cms_region c1 WHERE c1.region_id=cc.province) AS provinceName,
+	(SELECT region_name FROM cms_region c2 WHERE c2.region_id=cc.city) AS cityName,
+	(SELECT region_name FROM cms_region c3 WHERE c3.region_id=cc.AREA) AS areaName	,
+	(SELECT COUNT(1) num FROM cms_company c4 WHERE c4.circle_id =cc.id) AS companysTotal,
+(
+	SELECT
+		COUNT(1) num
+	FROM
+		cms_product c5
+	WHERE
+		TO_DAYS(FROM_UNIXTIME(c5.add_time)) = TO_DAYS(NOW())
+	AND c5.circle_id = cc.id
+) AS todayProductsTotal
+	FROM cms_circle cc 
+LIMIT #{0},#{1}
+	</select>
+	
+	
+	<!-- 查询我发布的产品信息 -->
+<select id="queryReleaseProductInfo" resultType="com.jg2b.h5.pojo.ProductPojo">
+SELECT
+	id,
+	category_id,
+	user_id,
+	brand_id,
+	title,
+	spec,
+	model,
+	circle_id,
+	quantity,
+	unit,
+	add_time,
+	remarks,
+	FLOOR((UNIX_TIMESTAMP(NOW())-add_time)/1000*60) timeago
+FROM
+	cms_product
+WHERE
+	user_id = #{0} and deleted = 0
+	ORDER BY add_time Desc
+	
+	limit #{1},#{2}
+	
+	</select>
+	
+
+	
+	<!-- 逻辑删除发布信息-->
+<update id="updateProdel" parameterType="int">
+		
+		update cms_product
+		set
+		deleted= 1
+		where id = #{id}
+	</update>
+	
+	<!--根据供应商id查询所代理的品牌名称  -->
+	<select id="queryBrandName" resultType="com.jg2b.h5.pojo.BrandPojo">
+SELECT
+	cb.brand_id,
+	cb.brand_name,
+cb.brand_logo,
+cb.companys,
+cb.first_letter,
+cb.infos,
+cb.keywords,
+cb.pinyin,
+cb.admin,
+cb.recommend,
+cb.sorts,
+cb.`status`
+FROM
+	cms_brand cb
+INNER JOIN cms_company_brand ccb ON ccb.brand_id = cb.brand_id
+INNER JOIN cms_company cc ON cc.company_id = ccb.company_id
+INNER JOIN cms_user cu ON cc.user_id = cu.user_id
+WHERE
+	cu.user_id = #{user_id}
+AND ccb.`status` = 1 AND cu.`group` = 1
+	</select>
+	
+	<!-- 发布产品-->
+<insert id="releaseProduct" parameterType="com.jg2b.h5.dto.ProductDto">
+INSERT INTO cms_product (
+category_id,
+	brand_id,
+	title,
+	spec,
+	circle_id,
+	quantity,
+	unit,
+	add_time,
+	remarks,
+	deleted
+)
+VALUES
+	(#{category_id},#{brand_id},#{title},#{spec},#{circle_id},#{quantity},#{unit},#{add_time},#{remarks},0)
+
+</insert>
+
+<select id="queryCircleId" resultType="int">
+SELECT
+	circle_id
+FROM
+	cms_company
+WHERE
+	user_id = #{user_id}
+</select>
+
+<select id="queryCircleByUserId" resultType="int">
+SELECT
+	cci.id,
+	cci.title,
+	cci.province,
+	cci.city,
+	cci.area,
+	cci.address,
+	cci.today_companys,
+	cci.companys,
+	cci.today_products,
+	cci.products,
+	cci.pic,
+	cci.add_time,
+	cci.short_title,
+	cci.product_time
+FROM
+	cms_circle cci 
+INNER JOIN cms_company cco ON cco.circle_id = cci.id
+INNER JOIN cms_user cu ON cu.user_id = cco.user_id
+
+</select>
+
+
+<select id="queryProductsByCompanyIdForPage" resultType="com.jg2b.h5.pojo.ProductPojo" parameterType="com.jg2b.h5.vo.CompanyPageVo">
+	SELECT
+		p.category_id,
+		p.brand_id,
+		p.title,
+		p.spec,
+		p.circle_id,
+		p.quantity,
+		p.unit,
+		p.add_time,
+		p.remarks,
+		p.deleted,
+		/**FLOOR((UNIX_TIMESTAMP(NOW())-p.add_time)/1000*60) AS MINUTE*/
+		FLOOR(FLOOR((UNIX_TIMESTAMP(NOW())-p.add_time)/1000*60)/(60*24)) as day,
+		FLOOR(FLOOR((UNIX_TIMESTAMP(NOW())-p.add_time)/1000*60)%(60*24)/60) as hour, 
+		FLOOR((UNIX_TIMESTAMP(NOW())-p.add_time)/1000*60)%(60*24)%60 as minute
+	FROM
+		cms_product p 
+		LEFT JOIN cms_user cu 
+			ON cu.user_id=p.user_id
+		LEFT JOIN cms_company cc 
+			ON cc.user_id=cu.user_id
+		
+		WHERE cc.company_id=#{company_id}
+		ORDER BY add_time DESC
+		LIMIT #{startIndex},#{pageSize}
+</select>
+
+</mapper>

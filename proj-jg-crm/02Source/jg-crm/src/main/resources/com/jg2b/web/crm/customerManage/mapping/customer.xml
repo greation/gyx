@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.customerManage.dao.CustomerDao">
+
+	<select id="queryCustomerName" resultType="java.lang.Integer">
+		select count(*)
+		from T_CRM_Customers where Name = #{name}
+	</select>
+
+
+	<insert id="insertCustomers" useGeneratedKeys="true" parameterType="com.jg2b.api.crm.customerManage.pojo.CustomerPojo"	 keyProperty="ID" >
+		INSERT INTO T_CRM_Customers (
+	GID,
+	Name,
+	CustType,
+	Classification,
+	Faxes,
+	Creater,
+	Channel,
+	CreateTime,
+	Deleted,
+	Owner,
+	Description,
+	LEVEL
+	)
+	VALUES
+	(
+		#{GID},#{name},#{custType},
+		#{classification},
+		#{faxes},#{creater},#{channel},#{createTime},0,#{owner},#{description},#{level})
+	</insert>
+
+	<update id="updateCustomers" parameterType="com.jg2b.api.crm.customerManage.pojo.CustomerPojo">
+		update T_CRM_Customers
+		set
+		Name=
+		#{name},CustType=#{custType},Classification=#{classification},Faxes=#{faxes},
+		Description=#{description},LEVEL=#{level},Channel=#{channel}
+		where ID = #{ID}
+	</update>
+
+	
+	<select id="queryCustGid" resultType="java.lang.String">
+		select GID
+		from T_CRM_Customers 
+		where ID=#{custId}
+
+	</select>
+
+
+	<select id="querCustomerInfo"
+		resultType="com.jg2b.api.crm.customerManage.bean.CustomerInformationBean">
+SELECT
+	tcc.ID custId,
+	tcc.GID custGID,
+	tcc.name name,
+	tcc.Faxes faxes,
+	tcc.createTime createTime,
+	tcc.Level level,
+	tcc.Classification classification,
+	tcc.Description description,
+	tcc.creater creater,
+	tcc.channel channel,
+	tcc.owner owner,
+	tcc.custType custType,
+	tct.NAME conname,
+	tct.Telphone telphone,
+	tcp.legal legal,
+	tcp.Capital capital,
+	tcp.CorpKind corpKind,
+	tcp.Industry industry,
+	tca.region region,
+	tcp.id compID,
+	tct.id contID
+FROM T_CRM_Customers tcc 
+LEFT JOIN T_CRM_Comp_Customers tcp ON tcc.GID = tcp.GID
+LEFT JOIN T_CRM_Contacts tct ON tcc.GID = tct.Owner
+LEFT JOIN T_Common_Address tca ON tca.SubscriberID = tcc.GID
+	 where tcc.ID=#{custId} 
+	 <!-- and tct.Group = 0 -->
+	</select>
+	
+</mapper>

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.jg2b.seoBrand.dao.CompanyDao">
+ 	<!-- 根据供应商uuid查询供应商所有信息 -->
+	<select id="queryCompanyInfoByUuid"  parameterType="com.jg2b.seoPojo.CompanyInfoPojo"  resultType="com.jg2b.seoPojo.CompanyInfoPojo">
+		SELECT 
+			C.company_id,
+			C.companyUuid,
+			C.user_id,
+			C.company,
+			C.address,
+			C.province,
+			C.city,
+			C.region,
+			C.email,
+			C.contacts,
+			C.mobile,
+			C.phone,
+			C.website,
+			C.capital,
+			C.offer,
+			C.status,
+			C.commend,
+			C.verify_note,
+			C.out_inquiry,
+			C.add_time,
+			C.admin,
+			C.mode2,
+			I.managementModel,
+			I.introduce,
+			I.businessScope,
+			I.main_products_server,                            
+			I.main_business,                                    
+			I.is_customizing,                    
+			I.employee_num,                                            
+			I.server_business,                                         
+			I.main_market,                                        
+			I.main_consumer,                                  
+			I.storage_area,                                          
+			I.yearly_turnover,                                       
+			I.createdOn
+		FROM
+			cms_company C
+		LEFT JOIN 
+			t_cust_companyIntroduce I
+		ON  C.companyUuid=I.companyUuid
+		WHERE
+			C.companyUuid=#{companyUuid}
+			AND 
+			I.deteted=1
+			<if test="status != null and status !='' ">
+				C.status=#{status}
+			</if>
+			<if test="commend != null and commend !='' ">
+				C.commend=#{commend}
+			</if>
+	</select>
+	<!-- 根据品牌uuid查询供应商所有信息 -->
+	<select id="queryCompanyInfosByBrandUuid"  parameterType="com.jg2b.seoPojo.CompanyInfoPojo"  
+		resultType="com.jg2b.seoPojo.CompanyInfoPojo">
+		SELECT 
+			C.company_id company_id,
+			C.companyUuid companyUuid,
+			C.user_id user_id,
+			C.company company,
+			C.address address,
+			C.province province,
+			C.city city,
+			C.region region,
+			C.email email,
+			C.contacts contacts,
+			C.mobile mobile,
+			C.phone phone,
+			C.website website,
+			C.capital capital,
+			C.offer offer,
+			C.status status,
+			C.commend commend,
+			C.verify_note verify_note,
+			C.out_inquiry out_inquiry,
+			C.add_time add_time,
+			C.admin admin,
+			C.mode2 mode2,
+			I.managementModel managementModel,
+			I.introduce introduce,
+			I.businessScope businessScope,
+			I.main_products_server,                            
+			I.main_business,                                    
+			I.is_customizing,                    
+			I.employee_num,                                            
+			I.server_business,                                         
+			I.main_market,                                        
+			I.main_consumer,                                  
+			I.storage_area,                                          
+			I.yearly_turnover,                                       
+			I.createdOn
+		FROM
+			cms_company C
+		INNER JOIN cms_company_brand o ON C.companyUuid = o.companyUuid
+		AND o.brandUuid=#{0}
+		INNER JOIN cms_brand b ON o.brandUuid = b.brandUuid
+		LEFT JOIN 
+			t_cust_companyIntroduce I
+		ON  C.companyUuid=I.companyUuid
+		WHERE 
+			I.deteted=1
+			LIMIT #{1},
+	 		#{2}
+	</select>
+	
+	
+	
+	<select id="queryCompanyInfosByBrandUuidCount"  parameterType="com.jg2b.seoPojo.CompanyInfoPojo"  resultType="int">
+		SELECT 
+			count(1)
+		FROM
+			cms_company C
+		INNER JOIN cms_company_brand o ON C.companyUuid = o.companyUuid
+		AND o.brandUuid=#{0}
+		INNER JOIN cms_brand b ON o.brandUuid = b.brandUuid
+		LEFT JOIN 
+			t_cust_companyIntroduce I
+		ON  C.companyUuid=I.companyUuid
+		WHERE
+			I.deteted=1
+	</select>
+	
+ 	<!-- 根据供应商uuid查询供应商主表信息 -->
+	<select id="queryCompanysByUuid"  parameterType="com.jg2b.seoPojo.CompanyPojo"  resultType="com.jg2b.seoPojo.CompanyPojo">
+		SELECT 
+			company_id,
+			companyUuid,
+			user_id,
+			company,
+			address,
+			province,
+			city,
+			region,
+			email,
+			contacts,
+			mobile,
+			phone,
+			website,
+			capital,
+			offer,
+			status,
+			commend,
+			verify_note,
+			out_inquiry,
+			add_time,
+			admin,
+			mode2
+		FROM
+			cms_company C
+		WHERE
+			C.companyUuid=#{companyUuid}
+			<if test="status != null and status !='' ">
+				C.status=#{status}
+			</if>
+			<if test="commend != null and commend !='' ">
+				C.commend=#{commend}
+			</if>
+	</select>
+	
+	<!-- 分页查询供应商信息 -->
+	<select id="queryCompanyInfoList"  parameterType="com.jg2b.seoPojo.CompanyInfoPojo"  resultType="com.jg2b.seoPojo.CompanyInfoPojo">
+		SELECT 
+			C.company_id,
+			C.companyUuid,
+			C.user_id,
+			C.company,
+			C.address,
+			C.province,
+			C.city,
+			C.region,
+			C.email,
+			C.contacts,
+			C.mobile,
+			C.phone,
+			C.website,
+			C.capital,
+			C.offer,
+			C.status,
+			C.commend,
+			C.verify_note,
+			C.out_inquiry,
+			C.add_time,
+			C.admin,
+			C.mode2,
+			I.managementModel,
+			I.introduce,
+			I.businessScope,
+			I.main_products_server,                            
+			I.main_business,                                    
+			I.is_customizing,                    
+			I.employee_num,                                            
+			I.server_business,                                         
+			I.main_market,                                        
+			I.main_consumer,                                  
+			I.storage_area,                                          
+			I.yearly_turnover,                                       
+			I.createdOn
+		FROM
+			cms_company C
+		LEFT JOIN 
+			t_cust_companyIntroduce I
+		ON C.companyUuid=I.companyUuid
+		<where>
+			1=1
+			AND I.deteted=1
+			<if test="companyInfoPojo.status != null and companyInfoPojo.status !='' ">
+           		and C.status=#{companyInfoPojo.status}
+        	</if>
+        	<if test="companyInfoPojo.commend != null and companyInfoPojo.commend !='' ">
+           		and C.commend=#{companyInfoPojo.commend}
+        	</if>
+        	<if test="companyInfoPojo.managementModel != null and companyInfoPojo.managementModel !='' ">
+           		AND I.managementModel=#{companyInfoPojo.managementModel}
+        	</if>
+		</where>
+		<if test="rowNum != null and rowNum !='' ">
+			<if test="startIndex != null and startIndex !='' ">
+           		LIMIT #{startIndex},#{rowNum}
+           	</if>
+        </if>
+	</select>
+	<!-- 查询供应商公司介绍信息-->
+	<select id="queryCompanyIntroduceByUuid"  parameterType="String"  resultType="com.jg2b.seoPojo.CompanyIntroducePojo">
+		SELECT 
+			managementModel,
+			introduce,
+			businessScope,
+			companyUuid,
+			companyId,
+			creator,
+			createtime,
+			updator,
+			updatetime,
+			deteted
+		FROM
+			t_cust_companyIntroduce C
+		<where>
+			C.companyUuid=#{companyUuid}
+			AND C.deteted=1
+		</where>
+	</select>
+</mapper>

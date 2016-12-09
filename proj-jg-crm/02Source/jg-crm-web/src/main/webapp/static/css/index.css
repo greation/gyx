@@ -1,0 +1,64 @@
+.crm_panel{
+	color: #000000;
+	font-weight: bold;
+	font-size: 16px;
+	margin: 10px
+}
+.div_panel{
+	/*border: 1px solid #D58512;*/
+	margin: 20px 4% 80px;
+	height: 180px;
+}
+.bg-danger1{
+	background-color:#fff ;
+	border: 1px solid #ffbf78;
+	box-shadow: #666 0px 0px 10px;
+}
+.bg-danger2{
+	background-color:#fff ;
+	border: 1px solid #ffa5a4;
+	box-shadow: #666 0px 0px 10px;
+}
+.bg-danger3{
+	background-color:#fff ;
+	border: 1px solid #7bcd81;
+	box-shadow: #666 0px 0px 10px;
+}
+.bg-danger4{
+	background-color:#fff ;
+	border: 1px solid #ba9fec;
+	box-shadow: #666 0px 0px 10px;
+}
+.bg-danger5{
+	background-color:#fff ;
+	border: 1px solid #93aff8;
+	box-shadow: #666 0px 0px 10px;
+}
+.bg-danger6{
+	background-color:#fff ;
+	border: 1px solid #73cbe1;
+	box-shadow: #666 0px 0px 10px;
+}
+.statistic-box{
+	padding: 28px;
+	text-align: center;
+	position: relative;
+	overflow: hidden;
+	border-radius:6px;
+	min-height: 230px
+}
+
+.statistic-box .statistic-value{
+	font-size: 36px;
+	font-weight: 600;
+	z-index: 2;
+}
+
+.m-top-md{
+	margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 20px;
+    font-size: 30px;
+    color: #999;
+    font-family: 微软雅黑 !important;
+}

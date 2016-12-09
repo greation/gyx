@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=750px,target-densitydpi=device-dpi,user-scalable=no">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="css/jg-.css" />
+		<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="js/uplo.js"></script>
+		<script type="text/javascript" src="js/base.js"></script>
+		<script>  
+        $(function () {  
+            //var btn = $("#Button1");  
+  
+            var btn = $("#Button1").uploadFile({  
+                url: baseUrl+"upload/uploadPic",  
+                fileSuffixs: ["bmp", "jpg", "jpeg", "gif", "png"],  
+                maximumFilesUpload: 5,//最大文件上传数  
+                onComplete: function (msg) { 
+                	alert(msg);
+                	var msg=jQuery.parseJSON(msg)[0];
+                	
+                	 $(".content-pic ul").append("<li style='float: left; margin: 20px;'>"
+                			 	+"<div>"
+                			 	+"<div title='' style='overflow: hidden; width: 180px; height: 180px; border: 1px solid rgb(235, 235, 235);'>"
+                			 	+"<img src="+baseUrl+msg.url+"' style='visibility: visible; width: 180px; height: 133px; margin-left: 0px; margin-top: 24px;'>"
+                			 	
+                			 	+"</div>"
+                			 	+"<div style='width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'></div>"
+                			 	+"<img src='' style='position: relative; top: -116px; right: -6810px; display: none;'>"
+                			 	+"</div>"
+                			 	+"</li> ");
+                },   
+                isGetFileSize: true,//是否获取上传文件大小，设置此项为true时，将在onChosen回调中返回文件fileSize和获取大小时的错误提示文本errorText  
+                onChosen: function (file, obj, fileSize, errorText) {  
+                    if (!errorText) {  
+                        $("#file_size").text(file + "文件大小为：" + fileSize + "KB");  
+                    } else {  
+                        alert(errorText);  
+                        return false;  
+                    }  
+                    return true;//返回false将取消当前选择的文件  
+                },  
+                perviewElementId: "fileList", //设置预览图片的元素id  
+                perviewImgStyle: { width: '180px', height: '180px', border: '1px solid #ebebeb' }//设置预览图片的样式  
+            });  
+  
+            var upload = btn.data("uploadFileData");  
+  
+            $("#files").click(function () {  
+                upload.submitUpload();  
+            });  
+        }); 
+        
+    </script>  
+	</head>
+
+	<body>
+		<header>
+			<div class="head-left" onclick="window.history.back(-1)"><span><img src="images/icon_19.png"/></span></div>
+			<div class="head-title"><span>代理品牌</span></div>
+			<div class="head-right"><span></span></div>
+		</header>
+		<div class="warm">
+			<p><font></font><span>请上传代理品牌资质证书</span></p>
+		</div>
+		<div class="addpic">
+			<div class="piclist">
+					<div class="content-pic">  
+            			<div id="fileList" >  
+            			</div> 
+            			<input id="Button1" type="button" class="xzwj" name="uploadFile"/>
+        			</div>
+			</div>
+		</div>
+		<div class="h40"></div>
+		<div class="sumbit" id="files">
+			<a>确定</a>
+		</div>
+	</body>
+
+</html>

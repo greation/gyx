@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.customerManage.dao.AddressDao">
+	 <insert id="insertAdress"  parameterType="java.util.List" >
+			
+			INSERT INTO T_Common_Address(GID,Owner,RefID,SubscriberType,
+			SubscriberID,Name,Region,Address,CreateTime,Deleted,OrderIndex)
+			VALUES
+			<foreach collection="list" item="item"  index="index" separator="," >	
+			(#{item.GID},#{item.owner},#{item.refID},#{item.subscriberType},#{item.subscriberID}
+			,#{item.name},#{item.region},#{item.address},#{item.createTime},0,-1)
+		    </foreach> 
+	 </insert>
+
+	 
+	  <update id="updateAdress"  parameterType="java.util.List" >
+			<foreach collection="list" item="item" open="" close=""  index="index" separator=";" >	
+			update T_Common_Address
+			set 
+			`Address`=#{item.address},`region`=#{item.region}
+		    where `ID`=#{item.ID}
+		    
+		    </foreach> 
+		      
+	 </update>
+	 
+	 <select id="queryAddressInfo" resultType="com.jg2b.api.crm.customerManage.pojo.AddressPojo">
+	select region,address,name,id from T_Common_Address t where t.SubscriberID = #{subscriberID}
+	</select> 
+	 
+	 
+</mapper>

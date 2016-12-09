@@ -1,0 +1,153 @@
+.crm_panel {
+    color: #000000;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 30px 0 0 15px;
+}
+
+
+.addcus3 {
+    margin: 0 0 0 15%;
+}
+
+.smart-widget .smart-widget-header {
+    padding: 15px;
+}
+
+.smart-widget .smart-widget-header .smart-widget-option {
+}
+
+.smart-widget .smart-widget-header .smart-widget-option a.widget-collapse-option {
+    transition: -moz-transform 0.4s ease 0s;
+}
+.smart-widget .smart-widget-header .smart-widget-option a {
+    color: #999;
+    display: inline-block;
+    font-size: 14px;
+    margin-right: 5px;
+    outline: 0 none;
+}
+
+.smart-widget .smart-widget-inner {
+    border-radius: 0 0 3px 3px;
+}
+
+.form-group {
+    margin: 15px !important;
+}
+
+.smart-widget-footer {
+    display: flex;
+    margin: 0 auto;
+    width: 30%;
+}
+
+.btn-block {
+    font-size: 14px;
+    margin: 0 10px 20px;
+    width: 30%;
+}
+
+.btn_gh {
+    background-color: #0074c1;
+    border: 1px solid #0074c1;
+    color: #fff;
+    font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.btn-block + .btn-block {
+    margin-top: 0;
+}
+
+.btn-cancel {
+    font-weight: 700;
+    background-color: #dad8d8;
+    border-color: #dad8d8;
+    color: #000000;
+}
+
+
+.fileStyle{
+	margin: 25px auto;
+    width: 70%;
+}
+
+
+input.fileStyle-box {
+    margin-top: 10px;
+}
+
+#demo{ margin:50px auto; width:90%; min-height:400px; background:#CF9}
+
+
+
+.form-horizontal .control-label {
+    padding-top: 0;
+}
+
+.smart-widget .smart-widget-header .smart-widget-option {
+    position: absolute;
+    right: 20px;
+}
+
+.bg_S{background-color: #fff;margin-top: 10px; box-shadow: 0 0 13px 0 #888;}
+.bg_P{position: absolute;top: 116px;}
+header {
+    padding-top: 10px;
+}
+
+
+
+#uploadForm > input {
+    float: left;
+}
+#uploadForm {
+    width: 50%;
+}
+
+
+
+.smart-widget-header > form {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+}
+
+.imgDel {
+    display: inline-table;
+    width: 10%;
+}
+
+
+.imgDel img {
+    height: 120px;
+    width: 190px;	
+}
+
+.info{
+	color: #0074c1;
+    float: left;
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

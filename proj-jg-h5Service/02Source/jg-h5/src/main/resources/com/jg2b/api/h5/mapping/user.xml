@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.jg2b.h5.dao.UserDao">
+	<!-- 根据电话号码查询得到一个用户信息 -->
+	<select id="queryUserInfoByPh" parameterType="String"
+		resultType="com.jg2b.h5.pojo.UserPojo">
+		select
+		c.user_id userId,
+		c.username userName,
+		c.password passWord,
+		c.mobile,
+		c.group,
+		c.contacts,
+		c.company,
+		c.address_id addressId,
+		c.status,
+		c.admin,
+		c.company_id companyId,
+		c.sales,
+		c.mode,
+		c.perfect
+		from cms_user c where c.mobile=#{phone}
+	</select>
+
+<!-- 重置密码-->
+<update id="resetPassWord" parameterType="com.jg2b.h5.pojo.UserPojo">
+		
+		update cms_user
+		set
+		password= #{0}
+		where mobile = #{1}
+	</update>
+	
+<!-- 用户注册 -->
+<insert id="userRegistered" parameterType="com.jg2b.h5.dto.UserDto">
+insert into cms_user (
+              <if test="userName != null and userName !='' ">
+               username ,
+              </if>
+              <if test="mobile != null and mobile !='' ">
+              mobile ,
+              </if>
+              <if test="reg_ip != null and reg_ip !='' ">
+              reg_ip ,
+              </if>
+              <if test="reg_time != null and reg_time !='' ">
+              reg_time ,
+              </if>
+              <if test="inquiry != null and inquiry !='' ">
+              inquiry ,
+              </if>
+              <if test="group != null and group !='' ">
+              group,
+              </if>
+              <if test="contacts != null and contacts !='' ">
+              contacts,
+              </if>
+              <if test="company != null and company !='' ">
+              company,
+              </if>
+              <if test="address_id != null and address_id !='' ">
+              address_id,
+              </if>
+              <if test="status != null and status !='' ">
+              STATUS,
+              </if>
+              <if test="admin != null and admin !='' ">
+              admin,
+              </if>
+              <if test="company_id != null and company_id !='' ">
+              company_id,
+              </if>
+             <if test="sales != null and sales !='' ">
+              sales,
+              </if>
+              <if test="mode != null and mode !='' ">
+              sales,
+              </if>
+              <if test="passWord != null and passWord !='' ">
+              password
+              </if>
+              ) 
+                VALUES (
+              <if test="userName != null and userName !='' ">
+               #{userName},
+              </if>
+              <if test="mobile != null and mobile !='' ">
+             #{mobile},
+              </if>
+              <if test="reg_ip != null and reg_ip !='' ">
+              #{reg_ip},
+              </if>
+              <if test="reg_time != null and reg_time !='' ">
+              #{reg_time},
+              </if>
+              <if test="inquiry != null and inquiry !='' ">
+             #{inquiry},
+              </if>
+              <if test="group != null and group !='' ">
+              #{group},
+              </if>
+              <if test="contacts != null and contacts !='' ">
+              #{contacts},
+              </if>
+              <if test="company != null and company !='' ">
+              #{company},
+              </if>
+              <if test="address_id != null and address_id !='' ">
+              #{address_id},
+              </if>
+              <if test="status != null and status !='' ">
+              #{status},
+              </if>
+              <if test="admin != null and admin !='' ">
+              #{admin},
+              </if>
+              <if test="company_id != null and company_id !='' ">
+              #{company_id},
+              </if>
+             <if test="sales != null and sales !='' ">
+              #{sales},
+              </if>
+              <if test="mode != null and mode !='' ">
+              #{mode},
+              </if>
+              <if test="passWord != null and passWord !='' ">
+              #{passWord}
+              </if>
+              )
+              </insert>
+              
+              
+  <!-- 公司注册 -->
+ <insert id="companyRegistered" parameterType="com.jg2b.h5.dto.CompanyDto">
+     INSERT INTO cms_company (
+    <if test="company != null and company !='' ">
+      company,
+    </if>
+    <if test="address != null and address !='' ">
+      address,
+    </if>
+    <if test="province != null and province !='' ">
+      province,
+    </if>
+    <if test="city != null and city !='' ">
+      city,
+    </if>
+     <if test="region != null and region !='' ">
+      region,
+    </if>
+     <if test="email != null and email !='' ">
+      email,
+    </if>
+     <if test="contacts != null and contacts !='' ">
+      contacts ,
+    </if>
+    <if test="mobile != null and mobile !='' ">
+      mobile,
+    </if>
+    <if test="phone != null and phone !='' ">
+      phone,
+    </if>
+    <if test="website != null and website !='' ">
+      website,
+    </if>
+    <if test="capital != null and capital !='' ">
+      capital,
+    </if>          
+      <if test="offer != null and offer !='' ">
+      offer,
+    </if>         
+      <if test="status != null and status !='' ">
+      status,
+    </if>         
+      <if test="commend != null and commend !='' ">
+      commend,
+    </if>         
+      <if test="verify_note != null and verify_note !='' ">
+      verify_note,
+    </if>            
+     <if test="out_inquiry != null and out_inquiry !='' ">
+      out_inquiry,
+    </if>  
+    <if test="add_time != null and add_time !='' ">
+      add_time,
+    </if>       
+    <if test="admin != null and admin !='' ">
+      admin,
+    </if>         
+    <if test="mode2 != null and mode2 !='' ">
+      mode2,
+    </if>
+    <if test="user_id != null and user_id !='' ">
+      user_id
+    </if>) 
+     VALUES ( 
+    <if test="company != null and company !='' ">
+      #{company},
+    </if>
+    <if test="address != null and address !='' ">
+      #{address},
+    </if>
+    <if test="province != null and province !='' ">
+      #{province},
+    </if>
+    <if test="city != null and city !='' ">
+      #{city},
+    </if>
+     <if test="region != null and region !='' ">
+      #{region},
+    </if>
+     <if test="email != null and email !='' ">
+      #{email},
+    </if>
+     <if test="contacts != null and contacts !='' ">
+      #{contacts},
+    </if>
+    <if test="mobile != null and mobile !='' ">
+      #{mobile},
+    </if>
+    <if test="phone != null and phone !='' ">
+     #{phone},
+    </if>
+    <if test="website != null and website !='' ">
+      #{website},
+    </if>
+    <if test="capital != null and capital !='' ">
+      #{capital},
+    </if>          
+      <if test="offer != null and offer !='' ">
+      #{offer},
+    </if>         
+      <if test="status != null and status !='' ">
+     #{status},
+    </if>         
+      <if test="commend != null and commend !='' ">
+      #{commend},
+    </if>         
+      <if test="verify_note != null and verify_note !='' ">
+      #{verify_note},
+    </if>            
+     <if test="out_inquiry != null and out_inquiry !='' ">
+      #{out_inquiry},
+    </if>  
+    <if test="add_time != null and add_time !='' ">
+      #{add_time},
+    </if>       
+    <if test="admin != null and admin !='' ">
+      #{admin},
+    </if>         
+    <if test="mode2 != null and mode2 !='' ">
+      #{mode2},
+    </if>
+    <if test="user_id != null and user_id !='' ">
+      #{user_id}
+    </if>) 
+     </insert>
+<!-- 插入用户分类 -->
+ <insert id="insertUserKind" parameterType="com.jg2b.h5.dto.CmsCategoryCompanyDto">
+     insert into cms_category_company(
+		 <if test="user_id != null and user_id !='' ">
+		   user_id,
+		 </if>
+		<if test="status != null and status !='' ">
+		   status,
+		 </if>
+		<if test="add_time != null and add_time !='' ">
+		   add_time,
+		 </if>
+		<if test="audit_time != null and audit_time !='' ">
+		   audit_time,
+		 </if>
+		<if test="reason != null and reason !='' ">
+		   reason,
+		 </if>
+		 <if test="c_id != null and c_id !='' ">
+		   c_id
+		 </if>
+		)values(
+		<if test="user_id != null and user_id !='' ">
+		   #{user_id},
+		 </if>
+		<if test="status != null and status !='' ">
+		   #{status},
+		 </if>
+		<if test="add_time != null and add_time !='' ">
+		   #{add_time},
+		 </if>
+		<if test="audit_time != null and audit_time !='' ">
+		   #{audit_time},
+		 </if>
+		<if test="reason != null and reason !='' ">
+		   #{reason},
+		 </if>
+		 <if test="c_id != null and c_id !='' ">
+		   #{c_id}
+		 </if>
+		)
+</insert>
+<!-- 插入用户品牌 -->
+<insert id="insertUserBrand" parameterType="com.jg2b.h5.dto.BrandUpload">
+insert into `cms_brand_upload`(
+<if test="user_id != null and user_id !='' ">
+   user_id,
+ </if>
+<if test="status!= null and status !='' ">
+   status,
+ </if>
+<if test="add_time!= null and add_time !='' ">
+   add_time,
+ </if>
+<if test="audit_time!= null and audit_time !='' ">
+   audit_time,
+ </if>
+<if test="reason!= null and reason !='' ">
+   reason,
+ </if>
+ <if test="pic!= null and pic !='' ">
+   pic
+ </if>
+
+)VALUES(
+<if test="user_id != null and user_id !='' ">
+  #{user_id},
+ </if>
+<if test="status!= null and status !='' ">
+   #{status},
+ </if>
+<if test="add_time!= null and add_time !='' ">
+   #{add_time},
+ </if>
+<if test="audit_time!= null and audit_time !='' ">
+   #{audit_time},
+ </if>
+<if test="reason!= null and reason !='' ">
+   #{reason},
+ </if>
+ <if test="pic!= null and pic !='' ">
+   #{pic}
+ </if>
+)
+</insert>
+<!--首页动态-->
+<select id="homeDynamic" resultType="com.jg2b.h5.dto.SearchDto">
+SELECT company_id,company,title,ty,mins FROM (
+SELECT 
+P.`company_id`,
+P.`company`,
+S.`title`,
+'0' AS ty,
+FLOOR((UNIX_TIMESTAMP(NOW())-S.add_time)/1000*60) mins
+FROM 
+(
+SELECT SE.title,SE.user_id,SE.add_time  FROM 
+cms_search SE
+LEFT JOIN cms_company PC ON SE.`user_id`=PC.`user_id`
+WHERE SE.add_time>CURDATE()-1 
+AND PC.user_id IS NOT NULL
+AND PC.status=1
+)S
+LEFT JOIN `cms_company` P ON S.`user_id`=P.`user_id`
+UNION ALL
+SELECT 
+P.`company_id`,
+P.`company`,
+S.`title`,
+'1' AS ty,
+FLOOR((UNIX_TIMESTAMP(NOW())-S.add_time)/1000*60) mINS
+FROM 
+(
+SELECT * FROM `cms_product`
+WHERE add_time>CURDATE()-1
+)S
+LEFT JOIN `cms_company` P ON S.`user_id`=P.`user_id`) a  LIMIT 5
+
+
+</select>
+
+<select id="checkUser"  parameterType="String"  resultType="String">
+SELECT 
+`mobile`
+FROM `cms_user` c
+WHERE c.`mobile`=#{mobile}
+</select>
+
+<select id="queryUserByid" parameterType="String" resultType="com.jg2b.h5.pojo.UserPojo">
+SELECT  
+`user_id`,
+`username`,
+`password`,
+`mobile`,
+`reg_ip`,
+`reg_time`,
+`inquiry`,
+`group`,
+`contacts`,
+`company`,
+`address_id`,
+`status`,
+`admin`,
+`company_id`,
+`sales`,
+`mode`,
+`perfect`
+FROM `cms_user` u  WHERE u.`mobile`=#{mobile}
+</select>
+</mapper>

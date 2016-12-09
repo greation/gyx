@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.userManage.dao.TestDao">
+
+	<select id="searchList" resultType="com.jg2b.api.crm.userManage.pojo.TestPojo">
+		SELECT
+		t.AppID as code,t.Name as name FROM T_Auth_Applications t
+	</select>
+</mapper>

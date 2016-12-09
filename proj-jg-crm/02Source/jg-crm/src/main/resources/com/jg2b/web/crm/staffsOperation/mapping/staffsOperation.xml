@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.staffsOperation.dao.IStaffsOperationDAO">
+
+	<select id="findAllSubordinatesDepartmentsByID" resultType="com.jg2b.api.crm.staffsOperation.pojo.DepartmentsPojo"
+		parameterType="String">
+		SELECT
+			ID,
+			Code,
+			Name,
+			Parent,
+			Supervisor,
+			Description,
+			CreateTime,
+			UpdateTime,
+			Deleted
+		FROM T_ORG_Departments
+		WHERE Parent = #{Code}
+	</select>
+
+
+	<select id="findStaffsOperationByCustId" resultType="com.jg2b.api.crm.staffsOperation.pojo.StaffsPojo"
+		parameterType="String">
+		SELECT
+		  *
+		FROM T_ORG_Staffs
+		WHERE ID = 
+		(Select BindingID FROM T_Auth_User_Binding where UserID = #{id})
+	</select>
+    
+    <select id="findStaffsPojoByDepartmentsIdList" resultType="com.jg2b.api.crm.staffsOperation.pojo.StaffsPojo"
+        parameterType="java.util.Map">
+		SELECT a.*,(SELECT NAME FROM `T_Auth_Users` c WHERE c.id = (SELECT UserID FROM `T_Auth_User_Binding` d WHERE d.BindingType ='T_ORG_Staffs' AND d.BindingID = a.`ID` )) Uname,
+		      (SELECT UserID FROM `T_Auth_User_Binding` d WHERE d.BindingType ='T_ORG_Staffs' AND d.BindingID = a.`ID` ) Uid
+		    FROM `T_ORG_Staffs` a,T_Auth_User_Binding b
+		    WHERE a.`ID` = b.`BindingID`
+		  and a.Department in (
+			<foreach collection="DpsCodes" item="item" index="index" separator=",">
+				#{item}
+			</foreach>
+			)
+		  <if test="name != null and name !='' ">
+            AND a.Name like CONCAT('%',#{name},'%')
+        </if>
+    </select>
+        
+</mapper>

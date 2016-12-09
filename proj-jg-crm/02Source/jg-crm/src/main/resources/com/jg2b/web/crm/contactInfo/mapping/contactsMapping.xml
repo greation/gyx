@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.contactInfo.dao.ContactDao">
+
+	<insert id="insertContacts" parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto">
+		INSERT INTO
+		T_CRM_Contacts(GID,Owner,`Group`,Name,Email,Gender,Title,Position,
+		Telphone,Creater,CreateTime,Modifer,Description,Deleted)
+		VALUES(#{GID},
+		#{owner},
+		1,
+		#{name},
+		#{email},
+		#{gender},
+		#{title},
+		#{position},
+		#{telphone},
+		#{create},
+		#{createTime},
+		#{mobile},
+		#{description},
+		0)
+	</insert>
+	<insert id="insertConAddress" parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto">
+		INSERT INTO
+		T_Common_Address(GID,Owner,SubscriberType,SubscriberID,Name,Region,Address,Zip,CreateTime)
+		values(#{GID},#{addowner},#{subscriberType},#{GID},#{addName},#{region},#{address},#{zip},#{createTime})
+	</insert>
+
+	<select id="searchCustByName" parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto"
+		resultType="java.lang.String">
+		select  GID from T_CRM_Customers where Deleted=0 and
+		Name=#{owner} limit 1 
+	</select>
+
+
+
+	<select id="searchContByName" parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto"
+		resultType="java.lang.String">
+		select ID from T_CRM_Contacts where Deleted=0 and
+		Name=#{name}
+	</select>
+
+	<update id="updateContacts" parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto">
+		update T_CRM_Contacts
+		set Name=#{name},Email=#{email},
+		Gender=#{gender},
+		Title=#{title},Position=#{position},Telphone=#{telphone},Description=#{description},
+		UpdateTime=#{createTime},
+		Owner=#{owner},
+		mobile=#{mobile}
+		where ID=#{yID}
+	</update>
+
+	<update id="updateAddress" parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto">
+		<!-- update T_Common_Address
+		set address=#{address},updateTime=#{createTime}
+		where OWNER=#{yID} -->
+		update T_Common_Address
+		set address=#{address},updateTime=#{createTime}
+		where OWNER in (select GID from T_CRM_Contacts where ID=#{yID} )
+	</update>
+	<select id="checkContacts" parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto"
+		resultType="com.jg2b.api.crm.contactInfo.dto.ContactDto">
+		select tau.Name name,tau.Mobile mobile from T_CRM_Contacts tcc LEFT JOIN T_CRM_Customers tcco
+		 ON tcc.owner=tcco.GID LEFT JOIN T_Auth_Users tau 
+		 on tau.GID=tcco.owner where tcc.telphone=#{telphone}
+	</select>
+
+	<select id="searchCustAll" resultType="java.lang.String"
+		parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto">
+		select tcc.Name from T_CRM_Customers tcc LEFT JOIN T_Auth_Users tau ON
+		tcc.owner=tau.ID
+		where tcc.owner=#{userId}
+		<if test="generalID !=null">
+			and tcc.ID=#{generalID}
+		</if>
+	</select>
+
+
+	<select id="searchContsByID" resultType="com.jg2b.api.crm.contactInfo.dto.ContactDto"
+		parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto">
+		SELECT
+	c.ID,
+	c.GID,
+	c. NAME,
+	c.Gender,
+	c.position,
+	c.title,
+	c.mobile,
+	c.Telphone,
+	tc. NAME OWNER,
+	c.description,
+	a.address,
+	c.email,
+	c.createTime,
+	tau. NAME generalName
+FROM
+	T_CRM_Contacts c
+LEFT JOIN T_Common_Address a ON c.GID = a. OWNER
+LEFT JOIN T_CRM_Customers tc ON c. OWNER = tc.GID
+LEFT JOIN T_Auth_Users tau ON tau.GID = tc. OWNER
+WHERE c.ID=#{ID}
+
+	</select>
+
+	<select id="findConNoName" resultType="java.lang.String">
+		select Name from
+		T_CRM_Customers where Name not in(#{owner})
+	</select>
+
+	<select id="searchContactAllByID" resultType="com.jg2b.api.crm.contactInfo.dto.ContactDto"
+		parameterType="java.lang.String">
+		SELECT
+	tcc.ID,
+	tcc.GID,
+	tcc. OWNER,
+	tcc. NAME,
+	tcc.gender,
+	tcc.Title,
+	tcc.Position,
+	tcc.Telphone,
+	tcc.Description,
+	tcc.deleted,
+	tcc.email,
+	tca.address,
+	tca. NAME addName
+FROM
+	T_CRM_Contacts tcc
+LEFT JOIN T_Common_Address tca ON tcc.GID = tca. OWNER
+WHERE
+	tcc.ID = #{ID}
+	</select>
+
+	<insert id="saveAttachments" parameterType="com.jg2b.common.pojo.AttachmentPojo" >
+		INSERT INTO T_Common_Attachments(GID,AttaType,SubscriberType,SubscriberID,StorageName,StoragePath,createTime) VALUES
+		(#{GID},#{attaType},#{subScriberType},#{subScriberID},#{storageName},#{storagePath},#{createTime})
+	</insert>
+	
+	
+	<select id="search_CustByID" parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto" 
+	resultType="com.jg2b.api.crm.contactInfo.dto.ContactDto">
+		select tcc.Name from T_CRM_Customers tcc LEFT JOIN T_Auth_Users tau ON
+		tcc.owner=tau.GID
+		where tau.ID=#{userId}
+	</select>
+	
+	<select id="searchPast" parameterType="com.jg2b.api.crm.contactInfo.dto.ContactDto" 
+		resultType="com.jg2b.api.crm.contactInfo.dto.TraceDto">
+		SELECT
+	t.UpdateTime,
+	t.Action,
+	tau. NAME Creator,
+	CONCAT_WS(
+		"。",
+		GROUP_CONCAT(t.`FIELDS` SEPARATOR ','),
+		GROUP_CONCAT(
+			CONCAT(t.`BEFORE`, '-->', t.`AFTER`) SEPARATOR ','
+		)
+	) text
+FROM
+	T_Common_Traces t,
+	T_Auth_Users tau,
+	T_CRM_Contacts tcc
+WHERE
+	t.creator = tau.GID
+AND tcc.GID=t.subscriberID
+AND tcc.ID=#{ID}
+GROUP BY
+	t.UpdateTime,
+	t.Action,
+	t.Creator
+ORDER BY
+	t.UpdateTime DESC
+	</select>
+	
+	
+<update id="deleteContace" parameterType="com.jg2b.api.crm.actionRecord.dto.AttachmentDto">
+
+	update T_CRM_Contacts
+		set
+		Deleted = 1
+		where ID = #{contId}
+</update>
+	
+	
+
+</mapper>

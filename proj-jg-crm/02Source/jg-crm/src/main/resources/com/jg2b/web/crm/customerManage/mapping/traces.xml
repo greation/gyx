@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.customerManage.dao.TracesDao">
+
+	<select id="queryTracesInfo" resultType="com.jg2b.api.crm.customerManage.vo.TracesVO">
+		SELECT
+	t.UpdateTime,
+	t.Action,
+	tau. NAME Creator,
+	CONCAT_WS(
+		"。",
+		GROUP_CONCAT(t.`FIELDS` SEPARATOR ','),
+		GROUP_CONCAT(
+			CONCAT(t.`BEFORE`, ',', t.`AFTER`) SEPARATOR ','
+		)
+	) text
+FROM
+	T_Common_Traces t,
+	T_Auth_Users tau,
+	T_CRM_Customers tcc
+WHERE
+	t.creator = tau.GID
+AND tcc.GID=t.subscriberID
+AND tcc.ID=#{custId}
+GROUP BY
+	t.UpdateTime,
+	t.Action,
+	t.Creator
+ORDER BY
+	t.UpdateTime DESC
+	</select>
+	
+	<select id="queryPublicTracesInfo" resultType="com.jg2b.api.crm.customerManage.vo.TracesVO"
+	parameterType="java.lang.String">
+
+SELECT
+	tau. NAME,
+	tct.action,
+	tct.creator,
+	tct.createTime,
+	cus. NAME AS customerName
+FROM
+	T_Common_Traces tct
+LEFT JOIN T_CRM_Customers cus ON tct.SubscriberID = cus.ID
+LEFT JOIN T_Auth_Users tau ON tct.`Creator` = tau.id
+WHERE
+	tct.SubscriberType = 'T_Common_Traces'
+AND (tct.ACTION = 0 OR tct.ACTION = 2)
+ORDER BY tct.CreateTime DESC  LIMIT 6
+	</select>
+	
+	
+	<select id="queryPrivateInfo" resultType="com.jg2b.api.crm.customerManage.vo.TracesVO"
+	parameterType="java.lang.String">
+	
+	SELECT
+	tau.name,tct.action,tct.creator,tct.createTime,cus.Name as customerName
+FROM
+	T_Common_Traces tct
+LEFT JOIN T_CRM_Customers cus ON tct.SubscriberID = cus.ID
+LEFT JOIN T_Auth_Users tau ON tct.`Creator` = tau.id
+WHERE
+	tct.SubscriberType = 'T_Common_Traces'
+AND tct.creator = #{userId}
+ORDER BY tct.CreateTime DESC  LIMIT 6
+	
+	</select>
+	<select id="queryUserNameByGID" parameterType="java.lang.String" resultType="java.lang.String">
+		select u.`name` from T_Auth_Users u where GID=#{gid}
+	</select>
+</mapper>

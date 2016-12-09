@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=750px,target-densitydpi=device-dpi,user-scalable=no">
+		<link rel="stylesheet" type="text/css" href="css/jg-.css" />
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/stringUtils.js"></script>
+		<script type="text/javascript" src="js/base.js"></script>
+		
+	</head>
+	<body>
+	
+		<div id="sendproduct">
+			<header>
+			<div class="head-left" onclick="window.history.back(-1)"><span><img src="images/icon_19.png"/></span></div>
+			<div class="head-title"><span>发布产品</span></div>
+			<div class="head-right"><span></span></div>
+		</header>
+		<div class="h10 mt5"></div>
+		<div class="warm">
+			<p><font></font><span>商品太多！您可以拨打服务热线，让鲸工帮助您。</span></p>
+		</div>
+		<div class="cDiv">
+			<div class="cSdiv">
+				<span class="cTitle">品牌</span>
+				<input type="text" class="cInput" id="brand_id" readonly="readonly"/>
+				<span class="arrow-r"><i class="iconr"></i></span>
+			</div>
+		</div>
+		<div class="cDiv">
+			<div class="cSdiv">
+				<span class="cTitle">品类</span>
+				<input type="text" class="cInput" id="categoryId"/>
+				<input type="hidden" class="cInput" id="category_id"/>
+			</div>
+		</div>
+		<div class="cDiv">
+			<div class="cSdiv">
+				<span class="cTitle">名称</span>
+				<input type="text" class="cInput" id="title"/>
+			</div>
+		</div>
+		
+		<div class="cDiv">
+			<div class="cSdiv">
+				<span class="cTitle">规格／型号</span>
+				<input type="text" class="cInput"  id="spec"/>
+
+			</div>
+		</div>
+		<div class="cDiv">
+			<div class="cSdiv">
+				<span class="cTitle">数量</span>
+				<input type="text" class="cInput" id="quantity"/>
+
+			</div>
+		</div>
+		<div class="cDiv">
+			<div class="cSdiv">
+				<span class="cTitle">单位</span>
+				<input type="text" class="cInput" id="unit"/>
+				<span class="arrow-r"><i class="iconr"></i></span>
+			</div>
+		</div>
+		<div class="cDiv">
+			<div class="cSdiv">
+				<span class="cTitle">备注</span>
+				<input type="text" class="cInput" id="remarks"/>
+
+			</div>
+		</div>
+		
+		<div class="sumbit" id="submit">
+			<a>确定</a>
+		</div>
+		</div>
+		<div id="choose_brand" style="display: none;">
+			<header>
+				<div class="head-left" onclick="window.history.back(-1)"><span><img src="images/icon_19.png"/></span></div>
+				<div class="head-title"><span>品牌选择</span></div>
+				<div class="head-right"><span></span></div>
+			</header>
+			<div id="mybrand">
+			</div>
+		 </div>
+		 <div id="tab4" style="display:none;">
+			 	<header>
+			<div class="head-left" onclick="window.history.back(-1)">
+				<span><img src="images/icon_19.png" /></span>
+			</div>
+			<div class="head-title">
+				<span>主营品类</span>
+			</div>
+		</header>
+		 </div>
+		 
+<script type="text/javascript">
+
+//校验表单数据
+function validateForm(){
+	return false;
+}
+
+$(".sumbit").bind('click',function(){
+	//获取品牌信息
+	var brand=document.getElementsByName("brandId")[0].value;
+	//获取品名信息
+	var title=$("#title").val();
+	//获取规格／型号
+	var spec=$("#spec").val();
+	//数量
+	var quantity=$("#quantity").val();
+	//单位
+	var unit=$("#unit").val();
+	//备注
+	var remarks=$("#remarks").val();
+	var category_id=$("#category_id").val();
+	
+	if(!validateForm){
+	//校验失败
+	}else{
+	//校验成功
+		$.ajax({
+		    type:"post",
+		    url: baseUrl+"company/releaseProduct.do",
+		    contentType: "application/json;charset=utf-8",
+		    dataType: "json",
+		    data: JSON.stringify({
+		        "productDto":{
+		            "brand_id":brand,
+		            "category_id":category_id,
+		            "title":title,
+		            "spec":spec,
+		            "quantity":quantity,
+		            "unit":unit,
+		            "remarks":remarks
+		        }
+		    }), 
+		    success: function (data) {
+		        //响应结果发布成功过跳转到我的产品页面
+		    	 window.location.href="product.html";
+		    },
+		    error : function(e) {alert("验证失败");}
+		});
+	}
+});
+
+$("#brand_id").click(function(){
+	  $("#sendproduct").hide();
+	  $("#choose_brand").show();
+	  if($("div[class=commen-h1").find("span").length==0){
+			   $.ajax({
+			    type:"post",
+			    url: baseUrl+"company/queryBrandName.do",
+			    contentType: "application/json;charset=utf-8",
+			    dataType: "json",
+			    success: function (data) {
+			    	var arrs=data.data;
+			    	for(var i=0;i<arrs.length;i++){
+			    		$("#mybrand").append("<div class='commen-h1' id="+arrs[i].brand_id+" title="+arrs[i].brand_name+"><span>"+arrs[i].brand_name+"</span></div>");
+			    		$("div[id="+arrs[i].brand_id+"]").click(function(){
+			    			$("#mybrand").empty();
+			    			$("#mybrand").append("<input type='hidden' name='brandName' value="+$(this).attr("title")+"><input type='hidden' name='brandId' value="+$(this).attr("id")+">");
+			    			 $("#sendproduct").show();
+			    			  $("#choose_brand").hide();
+			    			  $("#brand_id").val(document.getElementsByName("brandName")[0].value);
+			    		})
+			    	}
+			    },
+			    error : function(e) {alert("验证失败");}
+			});
+		
+	  }
+});	 
+$("#categoryId").click(function(){
+	$("#sendproduct").hide();
+	$("#tab4").show();
+	$.ajax({
+        type:"post",
+        url: baseUrl+"company/queryTopCategoryInfo.do",
+        contentType: "application/json;charset=utf-8",
+        dataType: "json", //表示返回值类型，不必须
+        async: false,
+        success: function(data) {
+          var a=JSON.stringify(data);
+          var b=JSON.parse(a);
+          var arrs=b.data;
+          for(var i=0;i<arrs.length;i++){
+        	  $("#tab4").append($("<div class='product-t' id="+arrs[i].id+"><div class='product-title'><i></i><span>"+arrs[i].title+"</span><a class='iconr'></a></div><div class='product-list'> <ul></ul></div></div>"));
+        	  $("[id="+arrs[i].id+" ]").click(function(){
+        		  if($("div[id="+$(this).attr("id")+"] ul").find("li").length==0){
+        			  //如果ul里面
+            		  $.ajax({
+            		        type:"post",
+            		        url: baseUrl+"company/queryChildCategoryInfo.do",
+            		        contentType: "application/json;charset=utf-8",
+            		        dataType: "json",
+            		        data: JSON.stringify({"topid":$(this).attr("id")}), 
+            		        async: false,
+            		        success: function (data) {
+            		        	  var a=JSON.stringify(data);
+            		              var b=JSON.parse(a);
+            		              var arrs1=b.data;
+            		              for(var j=0;j<arrs1.length;j++){
+             		            	 $("div[id="+arrs1[j].topid+"] ul").append("<li id="+arrs1[j].id+" title="+arrs1[j].title+"><span>"+arrs1[j].title+"</span><a   href='javascript:void(0)'></a></li>");
+             		            	 $("li[id="+arrs1[j].id+"]").click(function(){
+             		            		$("#tab4").empty();
+             		            		//已经添加状态
+     									$("#tab4").append("<input type='hidden' name='name' ids="+$(this).attr("id")+" value="+$(this).attr("title")+">");
+     									$("#tab4").append("<input type='hidden' name='id' ids1="+$(this).attr("id")+" value="+$(this).attr("id")+">");
+     									$("#categoryId").val(document.getElementsByName("name")[0].value);
+     									$("#category_id").val(document.getElementsByName("id")[0].value);
+     									$("#tab4").hide();
+            		        			$("#sendproduct").show();
+            		        			return;
+             		            	 })
+            		              }
+            		        },
+            		        error : function(e) {alert("验证失败");}
+            			});
+        		  }else{
+        			  $("div[id="+$(this).attr("id")+"] ul").toggle(100);
+        		  }
+        		  return false;
+        	  })
+          }
+        },
+        error : function(e) {alert("发送失败");}
+	});
+	
+});
+
+</script>		
+	</body>
+</html>

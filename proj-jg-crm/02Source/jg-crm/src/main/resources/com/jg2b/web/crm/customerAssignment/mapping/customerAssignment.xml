@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.customerAssignment.dao.ICustomerAssignmentDao">
+	<select id="findContactInfo" resultType="com.jg2b.api.crm.queryCustInfo.dto.QueryCustInfoDTO"
+		parameterType="com.jg2b.api.crm.queryCustInfo.dto.QueryCustInfoDTO">
+		SELECT
+			a.`Name` lname, 
+		    a.Telphone,
+		    a.Email,
+		    a.Gender,
+		    b.`Name`,
+		    d.Address
+			FROM
+			T_CRM_Contacts a
+			LEFT JOIN T_CRM_Customers b ON a.`Owner` = b.ID
+			LEFT JOIN T_CRM_Comp_Customers c ON b.ID = c.ID
+			LEFT JOIN T_Common_Address d ON b.id = d.SubscriberID
+		WHERE 1 = 1
+		<if test="name != null and name !='' ">
+           and b.`Name` like CONCAT('%',#{name},'%')
+        </if>
+        <if test="region != null and region !='' ">
+           and d.region = #{region}
+        </if>
+        <if test="industry != null and industry !='' ">
+           and b.Industry = #{industry}
+        </if>
+	</select>
+	
+	<update id="CustCheckIn" parameterType="java.util.Map">
+	   Update T_CRM_Customers set Owner = #{ownerid} where ID = #{custid}
+	</update>
+	
+	<update id="CustCheckOut" parameterType="java.lang.String">
+       Update T_CRM_Customers set Owner = '' where ID = #{custid}
+    </update>
+	
+	<select id="findCustById" resultType="com.jg2b.api.crm.queryCustInfo.pojo.CustomerPojo"
+        parameterType="java.lang.String">
+        SELECT * from
+            T_CRM_Customers 
+        WHERE id = #{id}
+    </select>
+	
+</mapper>

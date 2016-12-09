@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.queryCustInfo.dao.IQueryCustInfoDao">
+	<select id="findCustomerInfo" resultType="com.jg2b.api.crm.queryCustInfo.dto.QueryCustInfoDTO"
+		parameterType="com.jg2b.api.crm.queryCustInfo.dto.QueryCustInfoDTO">
+		SELECT
+			t.ID,
+			(select count(*) from T_CRM_Contacts ttcc ,T_CRM_Customers ttcu where ttcc.`Owner`=ttcu.GID and ttcu.ID=t.ID) conCount,
+			(select count(*) from T_CRM_ServiceNotes tcs ,T_CRM_Customers ttcc where tcs.owner=ttcc.GID and ttcc.ID=t.ID) notesCount,
+			t.GID,
+			t.NAME,
+			t.CustType,
+			t.Credits,
+			t.Actives,
+			t.Classification,
+			t.LEVEL,
+			t.Faxes,
+			t.Introduce,
+			t.CreateTime,
+			t.Creater,
+			t.UpdateTime,
+			t.Modifer,
+			t. OWNER,
+			t.Signer,
+			t.SignTime,
+			t.Auditer,
+			t.AuditTime,
+			t.Description,
+			t.Deleted,
+			c.Telphone,
+			c.Name AS LNAME,
+			u.Industry,
+			b.Address,
+			tau.`Name` uName,
+			tau.Mobile uMobile,
+			tau.GID uGID
+		FROM
+		T_CRM_Customers t
+		LEFT JOIN T_CRM_Comp_Customers u ON t.GID = u.GID
+		LEFT JOIN (select * from T_CRM_Contacts a where a.`Group` =0 ) c ON t.GID = c.`Owner`
+		LEFT JOIN T_Common_Address b ON t.GID =b.SubscriberID
+		LEFT JOIN T_Auth_Users tau on tau.GID=t.owner
+		LEFT JOIN T_Common_Codes cs ON u.industry=cs.Code
+		Where 1 = 1 
+		<if test="name!=null and name!=''">
+		AND t.`Name` LIKE '%${name}%'
+		</if>
+		<if test="sregion!=null and sregion!=''">
+		AND b.Region=#{sregion}
+		</if>
+		<if test="sindustry!=null and sindustry!=''">
+		AND u.industry=#{sindustry}
+		</if>
+		<if test="suserID!=null and suserID!=''">
+		 AND tau.ID=#{suserID}
+		</if>
+		 <if test="tID!=null and tID!='' ">
+		 AND tau.ID=#{tID}
+		</if>
+		
+		<if test="slevel!=null and  slevel!=''">
+		AND t.`Level`=#{slevel}
+		</if>
+		<if test="sclassification!=null and sclassification!=''">
+		AND t.Classification=#{sclassification}
+		</if>
+		<if test="schannel!=null and schannel!=''">
+		AND t.Channel=#{schannel}
+		</if>
+		GROUP BY t.ID
+		ORDER BY tau.GID DESC
+	</select>
+
+	<select id="findContactInfo" resultType="com.jg2b.api.crm.queryCustInfo.dto.QueryCustInfoDTO"
+		parameterType="com.jg2b.api.crm.queryCustInfo.dto.QueryCustInfoDTO">
+		SELECT
+		    a.ID,
+			a.`Name` lname, 
+		    a.Telphone,
+		    a.Email,
+		    a.Gender,
+		    b.`Name`,
+		    d.Address
+				FROM
+			T_CRM_Contacts a
+			JOIN T_CRM_Customers b ON a.`Owner` = b.GID
+			LEFT JOIN T_CRM_Comp_Customers c ON b.GID = c.GID
+			LEFT JOIN T_Common_Address d ON a.Gid = d.SubscriberID
+			LEFT JOIN T_Auth_Users u ON u.GID=b.Owner
+		WHERE 1 = 1
+		<if test="name != null and name !='' ">
+           and b.`Name` like CONCAT('%',#{name},'%')
+           or a.`Name` like CONCAT('%',#{name},'%')
+        </if>
+        <if test="region != null and region !='' ">
+           and d.region = #{region}
+        </if>
+        <if test="industry != null and industry !='' ">
+           and b.Industry = #{industry}
+        </if>
+        <if test="userid != null and userid !='' ">
+           and u.id = #{userid}
+        </if>
+	</select>
+	
+	<select id="findActivities" resultType="com.jg2b.api.crm.queryCustInfo.dto.ServiceNotesDTO"
+		parameterType="com.jg2b.api.crm.queryCustInfo.dto.QueryCustInfoDTO">
+		SELECT
+		    a.id,
+		    a.EndTime,
+			a.BeginTime,
+			b.`Name`,
+			(SELECT NAME FROM `T_Auth_Users` c WHERE c.GID = a.CSID) uname,
+			(SELECT Address FROM `T_Common_Address` d WHERE a.`GID` = d.SubscriberID AND d.SubscriberType ='T_CRM_ServiceNotes') a
+			FROM
+			T_CRM_ServiceNotes a
+			LEFT JOIN
+			T_CRM_Customers b ON a.`Owner` = b.GID
+			WHERE 1 = 1
+		<if test="name != null and name !='' ">
+			and (b.`Name` like CONCAT('%',#{name},'%') or a.Recepter like CONCAT('%',#{name},'%')  or a.Description like CONCAT('%',#{name},'%') )
+		</if>
+		<if test="userid != null and userid !='' ">
+			and a.CSID = #{userid}
+		</if>
+		<if test="begintime != null and begintime !='' ">
+           <![CDATA[and a.BeginTime > DATE_FORMAT(#{begintime}, '%Y-%m-%d')]]>  
+        </if>
+        <if test="endtime != null and endtime !='' ">
+           <![CDATA[and a.endTime < DATE_FORMAT(#{endtime}, '%Y-%m-%d')]]>  
+        </if>
+		order by a.BeginTime desc
+	</select>
+	
+</mapper>

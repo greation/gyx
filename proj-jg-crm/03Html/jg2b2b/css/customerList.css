@@ -1,0 +1,172 @@
+
+.btn_style{
+	padding-left: 20px;
+}
+
+.btn_style .btn-default{
+	border-radius:4px !important ;
+}
+
+.gh_st{
+	width: 10% !important;
+}
+.gh_st_2 {
+    margin-left: 20px;
+    width: 18% !important;
+}
+.input-group-addon, .input-group-btn{
+	width: 0;
+}
+
+.addcus{
+    position: absolute;
+    right: 0;
+}
+
+.addcus2{
+	background-color: #FFFFFF; 
+	border: 0;
+	border-radius: 4px
+}
+
+.crm_panel {
+    color: #000000;
+    display: flex;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 10px;
+}
+.jg_search {
+    width: 30%;
+}
+
+.dropdown-menu{
+	min-width: 111px;
+}
+
+.form-control{
+	color: #999;
+	font-size: 16px;
+}
+
+
+.smart-widget {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #fff;
+    border-color: #e4e4e4;
+    border-image: none;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 4px 1px 1px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+.smart-widget.widget-purple .smart-widget-header {
+    background-color: #fff;
+    /*color: #fff;*/
+}
+.smart-widget .smart-widget-header {
+    border-bottom: 0 solid #e6e6e6;
+    border-radius: 3px 3px 0 0;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.smart-widget .smart-widget-inner .smart-widget-body {
+    padding: 15px;
+}
+
+.sea_header {
+    font-weight: bold;
+    font-size: 16px;
+}
+.list_style {
+    list-style: outside none none;
+}
+
+.dashed_div {
+    color: #999;
+    margin: 0 auto 10px;
+    width: 100%;
+}
+
+.btn-block {
+    font-size: 14px;
+    margin: 0 10px 20px;
+    width: 30%;
+}
+
+.btn_gh {
+    background-color: #0074c1;
+    border: 1px solid #0074c1;
+    color: #fff;
+    font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.btn_gh:hover{
+	color: #fff;
+	background-color:#337AB7 ; 
+	border: 1px solid #337AB7;
+}
+
+
+.btn_gh:focus{
+	color: #fff;
+	background-color:#23527C ; 
+	border: 1px solid #23527C;
+}
+
+.btn_gh:active{
+	color: #fff;
+	background-color:#fed136 ; 
+	border: 1px solid #fed136;
+}
+
+
+.smart-widget-footer {
+    display: flex;
+    margin: 0 45px;
+    width: 100%;
+}
+
+.comlogo {
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    color: #ff0000;
+    font-size: 25px;
+    font-weight: bold;
+    height: 70px;
+    line-height: 65px;
+    margin: 0 auto;
+    width: 50%;
+}
+
+.contdiv {
+    color: #666;
+    list-style: outside none none;
+}
+
+.btn-block + .btn-block{
+	margin-top: 0px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.h5.dao.CategoryDao">
+	<!-- 得到所有的父类品类 -->
+	<select id="queryTopCategoryInfo" 
+		resultType="com.jg2b.h5.pojo.Category">
+		select
+		id,
+		title,
+		topid,
+		status,
+		icon
+		from cms_category where topid=0
+	</select>
+
+	<!-- 根据父类品类得到子类的品类 -->
+	<select id="queryChildCategoryInfo" 
+		resultType="com.jg2b.h5.pojo.Category" parameterType="int">
+		select
+		id,
+		title,
+		topid,
+		status,
+		icon
+		from cms_category where topid=#{0}
+	</select>
+	<!-- 得到所有的子类 -->
+	<select id="queryEveryChildCategory" 
+		resultType="com.jg2b.h5.pojo.Category" parameterType="int">
+		select
+		id,
+		title,
+		topid,
+		status,
+		icon
+		from cms_category where topid>0
+	</select>
+</mapper>

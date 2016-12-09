@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.customerManage.dao.ActionRecordDao">
+
+<!-- 根据订阅者id（行动记录id）查询图片 -->
+<select id="queryAttachmentPojoById"  parameterType="String" resultType="com.jg2b.api.crm.actionRecord.dto.AttachmentDto" >
+	SELECT a.id AS ID,a.StorageName AS storageName ,
+			a.StoragePath AS storagePath ,
+			a.Extensions AS extensions 
+			FROM T_Common_Attachments a 
+			WHERE a.SubscriberID=#{subID} AND a.Deleted=0
+</select>
+
+
+
+<update id="deleteCustInfo" parameterType="com.jg2b.api.crm.actionRecord.dto.AttachmentDto">
+
+	update T_Common_Attachments
+		set
+		Deleted = 1
+		where ID = #{attId}
+</update>
+
+<update id="updateAttachment" parameterType="com.jg2b.api.crm.actionRecord.dto.AttachmentDto">
+
+	update T_Common_Attachments 
+		set
+		Deleted = 1
+		where SubscriberID=#{subID}
+</update>
+
+	 <insert id="saveAttachments" useGeneratedKeys="true" parameterType="com.jg2b.common.pojo.AttachmentPojo" keyProperty="ID" >
+   <![CDATA[INSERT  INTO T_Common_Attachments(GID,AttaType,SubscriberType,SubscriberID,`GROUP`,PrimitiveName,StorageName,StoragePath,Extensions,Bytes,CheckNo,Algorithm,Deleted,CreateTime)VALUES
+					(
+					#{GID},
+					#{attaType},
+					#{subScriberType},
+					#{subScriberID},
+					#{group},
+					#{primitiveName},
+					#{storageName},
+					#{storagePath},
+					#{extensions},
+					#{bytes},
+					#{checkNo},
+					#{algorithm},
+					#{deleted},
+					#{createTime})]]>
+</insert>
+</mapper>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=750px,target-densitydpi=device-dpi,user-scalable=no">
+<title></title>
+<link rel="stylesheet" type="text/css" href="css/jg-.css" />
+<link rel="stylesheet" type="text/css" href="css/mui.picker.css" />
+<link rel="stylesheet" type="text/css" href="css/mui.poppicker.css" />
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="js/base.js"></script>
+<script type="text/javascript" src="js/iscroll.js"></script>
+<script type="text/javascript" src="js/register.js"></script>
+
+
+</head>
+<body>
+	<div id="tab1">
+		<header>		
+			<div class="head-left">
+				<a href="register.html"> <span><img
+						src="images/icon_19.png" /></span>
+				</a>
+			</div>
+			<div class="head-title">
+				<span>公司详情</span>
+			</div>
+			<div class="head-right">
+			<a  id="register-information_over">
+				<span><b>跳过</b></span>
+			</a>
+			</div>
+		</header>
+		<div class="warm">
+			<p>
+				<font></font><span>请完善您的公司信息，以便让其它商家找到您。</span>
+			</p>
+		</div>
+		<form method="post" action="index.html">
+			<div class="commen-h mt5">
+				<span>公司名称 :</span><input type="text" id="company" />
+
+			</div>
+			<div class="commen-h" id="showCityPicker3">
+				<span>公司地区 :</span> <input type="hidden" id="province" /> <input
+					type="text" id="cityResult3" name="" disabled="disabled"
+					style="background-color: #FFFFFF;" value="" /> <input
+					type="hidden" id="region" /> <input type="hidden" id="city" /> <a
+					class="iconr"></a>
+			</div>
+			<div class="commen-h">
+				<span>详细地址 :</span> <input type="text" class="addresss" id="address" />
+			</div>
+			<div class="commen-h">
+				<span>联系人 :</span> <input type="text" id="contacts" />
+			</div>
+			<div class="commen-h">
+				<span>电话 :</span> <input type="number" id="phone" />
+			</div>
+			<div class="commen-h">
+				<span>主营品类 :</span> <input type="text" id="kindList" /> <input
+					type="hidden" id="kindLlists" value="" /> <a class="iconr gsdq"></a>
+			</div>
+			<div class="commen-h" onclick="window.location.href='brand.html'">
+				<span>代理品牌 :</span> <input type="text" id="brandLists" /> <a
+					class="iconr"></a>
+			</div>
+			<div class="commen-h">
+				<span>所在商圈 :</span> <input type="text" id="circleId" value="" /> <input
+					type="hidden" id="circle_id" value="" /> <a class="iconr szsq"></a>
+			</div>
+			<div class="commen-h">
+				<span>注册资金 :</span> <input type="text" id="capital" />
+			</div>
+			<div class="hotline">
+				<a></a>
+			</div>
+			<div class="sumbit-r" id="save">
+				<a>保存</a>
+			</div>
+		</form>
+	</div>
+	<div id="tab2" style="display: none">
+		<header>
+			<div class="head-left">
+				<span><img src="images/icon_19.png" /></span>
+			</div>
+			<div class="head-title">
+				<span>主营品类</span>
+			</div>
+			<div class="head-right" id="cat">
+				<span><b>确定</b></span>
+			</div>
+		</header>
+
+	</div>
+	<div id="tab3" style="display: none;">
+		<header>
+			<div class="head-left">
+				<span><img src="images/icon_19.png" /></span>
+			</div>
+			<div class="head-title">
+				<span> 所在商圈</span>
+			</div>
+			<div class="head-right">
+				<span></span>
+			</div>
+		</header>
+		<p id="show" style="display:none;"></p> 
+		<div id="wrapper">
+			<div id="scroller">
+				<div id="pullDown">
+					<span class="pullDownIcon"></span><span class="pullDownLabel">Pull down to refresh...</span>
+				</div>
+				<ul id="thelist">
+					<input type="hidden" value="1" />
+				</ul>
+				<div id="pullUp" style="display:none;" >
+					<span class="pullUpIcon"></span><span class="pullUpLabel">Pull up to refresh...</span>
+				</div>
+		
+			</div>
+		</div>
+
+	</div>
+	<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="js/mui.min.js"></script>
+	<script type="text/javascript" src="js/mui.picker.js"></script>
+	<script type="text/javascript" src="js/mui.poppicker.js"></script>
+	<script type="text/javascript" src="js/city.data-3.js"></script>
+
+	<script type="text/javascript" src="js/register-information.js"></script>
+
+	<script type="text/javascript">
+		
+		(function($, doc) {
+			$.init();
+			
+			$.ready(function() {
+				
+				//-----------------------------------------
+				//					//级联示例
+				var cityPicker3 = new $.PopPicker({
+					layer: 3
+				});
+				cityPicker3.setData(cityData3);
+				var showCityPickerButton = doc.getElementById('showCityPicker3');
+				
+				showCityPickerButton.addEventListener('tap', function(event) {
+					cityPicker3.show(function(items) {
+						
+						document.getElementById('cityResult3').value=((items[0] || {}).text + " " + (items[1] || {}).text + " " + (items[2] || {}).text);
+						
+						document.getElementById('province').value=(items[0] || {}).value;
+						
+						document.getElementById('region').value=(items[1] || {}).value;
+						
+						document.getElementById('city').value=(items[2] || {}).value;
+						
+						//alert(cityResult3.val());
+						//cityResult3.val("你选择的城市是:" + (items[0] || {}).text + " " + (items[1] || {}).text + " " + (items[2] || {}).text);
+						//返回 false 可以阻止选择框的关闭
+						//return false;
+					});
+				}, false);
+			});
+
+
+
+			
+			})(mui, document);
+		
+		$(document).ready(function(){
+				$(".gsdq").click(function(){
+				$("#tab1").hide();
+				$("#tab2").show();
+				
+				});
+				
+				
+		});
+		$("#circleId").click(function(){
+			$("#tab3").show();
+			$("#tab1").hide();
+		});
+		$(".szsq").click(function(){
+			$("#tab3").show();
+			$("#tab1").hide();
+		});
+		$("#kindList").click(function(){
+			$("#tab2").show();
+			$("#tab1").hide();
+		});
+		$("#thelist").on("click",'.lstcircle',function(){
+			
+		    var circleId=$(this).children("input").val();
+		    var title=$(this).children("span").text();
+		    $("#circleId").val(title);
+		    $("#circle_id").val(circleId);
+		    $("#tab3").hide();
+		    $("#tab1").show();
+		});
+		
+		$("div[id=cat]").click(function(){
+			$("#tab2").hide();
+			$("#tab1").show();
+			var titles=document.getElementsByName("name");
+			var str="";
+			for(var i=0;i<titles.length;i++){
+				str+=titles[i].value+",";
+			}
+			$("#kindList").val(str);
+			//隐藏域中传值到ctroller
+			str="";
+			var ids=document.getElementsByName("id");
+			for(var j=0;j<ids.length;j++){
+				str+=ids[j].value+",";
+			}
+			$("#kindLlists").val(str);
+		})
+		
+		
+		</script>
+	<script type="text/javascript" src="js/productlist.js"></script>
+</body>
+</html>

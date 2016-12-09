@@ -1,0 +1,36 @@
+.crm_panel{
+	color: #000000;
+	font-weight: bold;
+	font-size: 16px;
+	margin: 10px
+}
+.div_panel{
+	/*border: 1px solid #D58512;*/
+	margin: 1% 4%;
+	height: 180px;
+}
+.bg-danger{
+	background-color:#e36159 ;
+}
+.statistic-box{
+	padding: 28px;
+	text-align: center;
+	position: relative;
+	overflow: hidden;
+	border-radius:6px;
+	
+}
+
+.statistic-box .statistic-value{
+	font-size: 36px;
+	font-weight: 600;
+	z-index: 2;
+}
+
+.m-top-md{
+	margin-left: 10%;
+	margin-right: 10%;
+	margin-top: 20px;
+    font-weight: bold;
+    font-size: 25px;
+}

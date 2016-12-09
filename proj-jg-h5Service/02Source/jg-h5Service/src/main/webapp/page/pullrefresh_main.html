@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=750px,target-densitydpi=device-dpi,user-scalable=no">
+
+		<!-- <link rel="stylesheet" href="css/mui.min.css"> -->
+		<link rel="stylesheet" type="text/css" href="css/jg-.css" />
+		
+	</head>
+
+	<body style="height:100%">
+		<header>
+			<div class="head-left" onclick="window.history.back(-1)"><span><img src="images/icon_19.png"/></span></div>
+			<div class="head-title"><span>我的产品</span></div>
+			<div class="head-right" onclick="release()"><span><b>发布</b></span></div>
+		</header>
+		<div class="h10 mt5"></div>
+		<div class="warm">
+			<p><font></font><span>发布您的供应商品，能让商家更容易的找到您。</span></p>
+		</div>
+		<div class="mui-content"></div>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script type="text/javascript">
+		//启用双击监听
+		mui.init({
+			gestureConfig:{
+				doubletap:true
+			},
+			subpages:[{
+				url:'pullrefresh_sub.html',
+				id:'pullrefresh_sub.html',
+				styles:{
+					top: '45px',
+					bottom: '0px',
+				}
+			}]
+		});
+	
+		var contentWebview = null;
+		document.querySelector('header').addEventListener('doubletap',function () {
+			if(contentWebview==null){
+				contentWebview = plus.webview.currentWebview().children()[0];
+			}
+			contentWebview.evalJS("mui('#pullrefresh').pullRefresh().scrollTo(0,0,100)");
+		});
+	</script>
+
+</html>

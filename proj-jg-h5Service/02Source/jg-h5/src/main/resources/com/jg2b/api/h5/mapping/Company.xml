@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.h5.dao.CompanyDao">
+
+	
+	<!-- 根据用户ID查询该用户最近联系的公司详情 -->
+	<select id="queryCompanyDetail" resultType="com.jg2b.h5.dto.CompanyDto" parameterType="int">
+		select 
+		cy.company_id company_id,
+		cy.user_id user_id,
+		cy.company company,
+		cy.address address,
+		cy.commend commend,
+		cy.is_proxy is_proxy,
+		cy.is_address is_address,
+		cy.contacts contacts,
+		cu.mobile mobile 
+		from cms_contact cc LEFT JOIN cms_company cy on
+		cc.company_id=cy.user_id
+		INNER JOIN cms_user cu on cy.user_id=cu.user_id where cc.user_id=#{0}
+		ORDER BY cc.add_time DESC
+		limit #{1},#{2}
+		
+	</select>
+
+	<!-- 根据供应商ID查询公司主营产品 -->
+	<select id="queryCompanyGoodsName" resultType="String" parameterType="int">
+		select cp.title from cms_product cp LEFT JOIN cms_company cc on
+		cp.user_id=cc.user_id where cc.company_id=#{0}
+	</select>
+	
+	
+	<!-- 根据供应商ID查询公司主营品牌 -->
+	<select id="queryCompanyBrandName" resultType="String" parameterType="int">
+		select cb.brand_name from cms_brand cb LEFT JOIN cms_company_brand ccb
+		on cb.brand_id=ccb.brand_id LEFT JOIN cms_company cc on
+		ccb.company_id=cc.company_id where cc.company_id=#{0}
+	</select>
+	
+	<!-- 增加用户最近联系 -->
+	<insert id="addContact" parameterType="com.jg2b.h5.pojo.ContactPojo">
+		insert into cms_contact (user_id,company_id,add_time)
+		values(#{user_id},#{company_id},#{add_time})
+	
+	</insert>
+
+	<!-- 主搜索查询页面功能   -->
+	<select id="queryCompanyIdsForMainSearch" resultType="String" parameterType="com.jg2b.h5.vo.MainPageQueryVo">
+		SELECT DISTINCT company_id
+			<!--company,commend,add_time,is_address-->
+			FROM
+			(
+			<!--	所有精准查询如下	-->
+			<if test="search_type != null and search_type !='' and search_type =='PRECISE'">
+	             /**所有精准查询如下*/
+				SELECT  DISTINCT c.company_id,
+					c.company,c.commend,c.add_time,c.is_address
+					FROM cms_company c
+					LEFT JOIN cms_company_brand cb ON cb.company_id=c.company_id
+					LEFT JOIN cms_brand b ON cb.brand_id=b.brand_id
+					LEFT JOIN cms_product p ON p.brand_id=b.brand_id
+					LEFT JOIN cms_category_company ccc ON ccc.user_id=c.user_id
+					LEFT JOIN cms_category cags ON cags.id=ccc.c_id
+					/**品类父类*/
+					LEFT JOIN cms_category cagp ON cags.id=cagp.id OR cags.topid=cagp.id
+				WHERE  
+				c.status=1
+				<if test="brand_id != null and brand_id !=''">
+					/**品牌*/
+					AND cb.brand_id=#{brand_id}
+				</if>
+				<if test="c_id != null and c_id !=''">
+					/**品类*/
+					AND ccc.c_id=#{c_id}
+				</if>
+				<if test="circle_id != null and circle_id !=''">
+					/**商圈*/
+					AND c.circle_id=#{circle_id}
+				</if>
+			
+			</if>
+			<!--	所有带模糊查询接口	-->
+			<if test="search_type != null and search_type !='' and search_type =='GENERAL'">
+				/**所有模糊查询如下*/
+				/**第一类查询 商家*/
+				SELECT  DISTINCT c.company_id,
+					c.company,c.commend,c.add_time,c.is_address
+					FROM cms_company c
+					LEFT JOIN cms_company_brand cb ON cb.company_id=c.company_id
+					LEFT JOIN cms_brand b ON cb.brand_id=b.brand_id
+					LEFT JOIN cms_product p ON p.brand_id=b.brand_id
+					LEFT JOIN cms_category_company ccc ON ccc.user_id=c.user_id
+					LEFT JOIN cms_category cags ON cags.id=ccc.c_id
+					/**品类父类*/
+					LEFT JOIN cms_category cagp ON cags.id=cagp.id OR cags.topid=cagp.id
+				WHERE  
+				c.status=1
+				/**step 1 商家匹配*/
+				<if test="pageQueryParam != null and pageQueryParam !=''">
+					AND c.company LIKE CONCAT('%','${pageQueryParam}','%' )
+				</if>
+				<if test="brand_id != null and brand_id !=''">
+					/**品牌*/
+					AND cb.brand_id=#{brand_id}
+				</if>
+				<if test="c_id != null and c_id !=''">
+					/**品类*/
+					AND ccc.c_id=#{c_id}
+				</if>
+				<if test="circle_id != null and circle_id !=''">
+					/**商圈*/
+					AND c.circle_id=#{circle_id}
+				</if>
+				
+				UNION ALL
+				/**第二类查询 型号*/
+				SELECT  DISTINCT c.company_id,
+					c.company,c.commend,c.add_time,c.is_address
+					FROM cms_company c
+					LEFT JOIN cms_company_brand cb ON cb.company_id=c.company_id
+					LEFT JOIN cms_brand b ON cb.brand_id=b.brand_id
+					LEFT JOIN cms_product p ON p.brand_id=b.brand_id
+					LEFT JOIN cms_category_company ccc ON ccc.user_id=c.user_id
+					LEFT JOIN cms_category cags ON cags.id=ccc.c_id
+					/**品类父类*/
+					LEFT JOIN cms_category cagp ON cags.id=cagp.id OR cags.topid=cagp.id
+				WHERE  
+				c.status=1
+				/**step 1 型号匹配*/
+				<if test="pageQueryParam != null and pageQueryParam !=''">
+					AND p.model LIKE CONCAT('%','${pageQueryParam}','%' )
+				</if>
+				<if test="brand_id != null and brand_id !=''">
+					/**品牌*/
+					AND cb.brand_id=#{brand_id}
+				</if>
+				<if test="c_id != null and c_id !=''">
+					/**品类*/
+					AND ccc.c_id=#{c_id}
+				</if>
+				<if test="circle_id != null and circle_id !=''">
+					/**商圈*/
+					AND c.circle_id=#{circle_id}
+				</if>
+				
+				UNION ALL
+				/**第三类查询 品名*/
+				SELECT  DISTINCT c.company_id,
+					c.company,c.commend,c.add_time,c.is_address
+					FROM cms_company c
+					LEFT JOIN cms_company_brand cb ON cb.company_id=c.company_id
+					LEFT JOIN cms_brand b ON cb.brand_id=b.brand_id
+					LEFT JOIN cms_product p ON p.brand_id=b.brand_id
+					LEFT JOIN cms_category_company ccc ON ccc.user_id=c.user_id
+					LEFT JOIN cms_category cags ON cags.id=ccc.c_id
+					/**品类父类*/
+					LEFT JOIN cms_category cagp ON cags.id=cagp.id OR cags.topid=cagp.id
+				WHERE  
+				c.status=1
+				/**step 1 品名匹配*/
+				<if test="pageQueryParam != null and pageQueryParam !=''">
+					AND p.title LIKE CONCAT('%','${pageQueryParam}','%' )
+				</if>
+				<if test="brand_id != null and brand_id !=''">
+					/**品牌*/
+					AND cb.brand_id=#{brand_id}
+				</if>
+				<if test="c_id != null and c_id !=''">
+					/**品类*/
+					AND ccc.c_id=#{c_id}
+				</if>
+				<if test="circle_id != null and circle_id !=''">
+					/**商圈*/
+					AND c.circle_id=#{circle_id}
+				</if>
+				
+				UNION ALL
+				/**第四类查询 子类品类*/
+				SELECT  DISTINCT c.company_id,
+					c.company,c.commend,c.add_time,c.is_address
+					FROM cms_company c
+					LEFT JOIN cms_company_brand cb ON cb.company_id=c.company_id
+					LEFT JOIN cms_brand b ON cb.brand_id=b.brand_id
+					LEFT JOIN cms_product p ON p.brand_id=b.brand_id
+					LEFT JOIN cms_category_company ccc ON ccc.user_id=c.user_id
+					LEFT JOIN cms_category cags ON cags.id=ccc.c_id
+					/**品类父类*/
+					LEFT JOIN cms_category cagp ON cags.id=cagp.id OR cags.topid=cagp.id
+				WHERE  
+				c.status=1
+				/**step 1 品类匹配*/
+				<if test="pageQueryParam != null and pageQueryParam !=''">
+					AND cags.title LIKE CONCAT('%','${pageQueryParam}','%' )
+				</if>
+				<if test="brand_id != null and brand_id !=''">
+					/**品牌*/
+					AND cb.brand_id=#{brand_id}
+				</if>
+				<if test="c_id != null and c_id !=''">
+					/**品类*/
+					AND ccc.c_id=#{c_id}
+				</if>
+				<if test="circle_id != null and circle_id !=''">
+					/**商圈*/
+					AND c.circle_id=#{circle_id}
+				</if>
+				
+				UNION ALL
+				/**第五类查询 父类品类*/
+				SELECT  DISTINCT c.company_id,
+					c.company,c.commend,c.add_time,c.is_address
+					FROM cms_company c
+					LEFT JOIN cms_company_brand cb ON cb.company_id=c.company_id
+					LEFT JOIN cms_brand b ON cb.brand_id=b.brand_id
+					LEFT JOIN cms_product p ON p.brand_id=b.brand_id
+					LEFT JOIN cms_category_company ccc ON ccc.user_id=c.user_id
+					LEFT JOIN cms_category cags ON cags.id=ccc.c_id
+					/**品类父类*/
+					LEFT JOIN cms_category cagp ON cags.id=cagp.id OR cags.topid=cagp.id
+				WHERE  
+				c.status=1
+				/**step 1 品类匹配*/
+				<if test="pageQueryParam != null and pageQueryParam !=''">
+					AND cagp.title LIKE CONCAT('%','${pageQueryParam}','%' )
+				</if>
+				<if test="brand_id != null and brand_id !=''">
+					/**品牌*/
+					AND cb.brand_id=#{brand_id}
+				</if>
+				<if test="c_id != null and c_id !=''">
+					/**品类*/
+					AND ccc.c_id=#{c_id}
+				</if>
+				<if test="circle_id != null and circle_id !=''">
+					/**商圈*/
+					AND c.circle_id=#{circle_id}
+				</if>
+				
+				UNION ALL
+				/**第六类查询 品牌*/
+				SELECT  DISTINCT c.company_id,
+					c.company,c.commend,c.add_time,c.is_address
+					FROM cms_company c
+					LEFT JOIN cms_company_brand cb ON cb.company_id=c.company_id
+					LEFT JOIN cms_brand b ON cb.brand_id=b.brand_id
+					LEFT JOIN cms_product p ON p.brand_id=b.brand_id
+					LEFT JOIN cms_category_company ccc ON ccc.user_id=c.user_id
+					LEFT JOIN cms_category cags ON cags.id=ccc.c_id
+					/**品类父类*/
+					LEFT JOIN cms_category cagp ON cags.id=cagp.id OR cags.topid=cagp.id
+				WHERE  
+				c.status=1
+				/**step 1 品牌匹配*/
+				<if test="pageQueryParam != null and pageQueryParam !=''">
+					AND b.brand_name LIKE CONCAT('%','${pageQueryParam}','%' )
+				</if>
+				<if test="brand_id != null and brand_id !=''">
+					/**品牌*/
+					AND cb.brand_id=#{brand_id}
+				</if>
+				<if test="c_id != null and c_id !=''">
+					/**品类*/
+					AND ccc.c_id=#{c_id}
+				</if>
+				<if test="circle_id != null and circle_id !=''">
+					/**商圈*/
+					AND c.circle_id=#{circle_id}
+				</if>
+			</if>
+			)CM
+			ORDER BY CM.commend,CM.is_address,CM.add_time
+			limit #{startIndex},#{pageSize}
+	</select>
+
+	<!-- 根据用户ID查询用户信息 -->
+	<select id="queryDetailUserInfo" parameterType="int" resultType="com.jg2b.h5.dto.UserDetailDto">
+		select
+		cy.company_id company_id,
+		cc.id id,
+		cu.user_id user_id,
+		cu.username username,
+		cu.mobile mobile,
+		cy.company companyName,
+		cy.province province,
+		cy.city city,
+		cy.region region,
+		cy.address address,
+		cy.contacts contacts,
+		cy.is_proxy is_proxy,
+		cy.is_address is_address,
+		cy.phone phone,
+		cc.title circle,
+		cy.license license
+		from cms_user cu LEFT JOIN cms_company cy on cu.user_id=cy.user_id left
+		JOIN cms_circle cc on cy.circle_id=cc.id where cu.user_id=#{0}
+	</select>
+	
+	<!-- 根据供应商ID查询公司主营品类 -->
+	<select id="queryCompanyCategoryName" resultType="String" parameterType="int">
+		select cc.title from cms_category cc LEFT JOIN cms_category_company ccc
+		on cc.id=ccc.c_id LEFT JOIN cms_company cco on
+		ccc.user_id=cco.user_id where cco.user_id=#{0}
+	</select>
+	
+	<!-- 根据regionID查询地区名字 -->
+	<select id="queryRegionName" resultType="String" parameterType="int">
+		select region_name from cms_region where region_id=#{0}
+	</select>
+	
+	<!-- 根据一列id查询公司信息 -->
+	<select id="queryCompanysByIds" resultType="com.jg2b.h5.dto.CompanyDto" parameterType="List">
+		select 
+		cy.company_id company_id,
+		cu.user_id user_id,
+		cu.company company,
+		cy.address address,
+		cy.commend commend,
+		cy.is_proxy is_proxy,
+		cy.is_address is_address,
+		cy.contacts contacts,
+		cu.mobile mobile 
+		from cms_company cy 
+		LEFT JOIN cms_contact cc on
+			cc.company_id=cy.user_id
+		INNER JOIN cms_user cu 
+			on cy.user_id=cu.user_id
+		where 
+			cy.company_id in
+		<foreach item="item" index="index"  collection="list" open="(" separator="," close=")">
+    		#{item}
+ 		</foreach>
+	</select>
+
+	<!--根据用户id查询公司信息-->
+	<select id="queryCompanyByUserId" parameterType="int" resultType="com.jg2b.h5.dto.CompanyDto">
+	SELECT `company_id`,
+        `user_id`,
+        `company`,
+        `address`,
+        `city`,
+        `province`,
+        `region`,
+        `email`,
+        `contacts`,
+        `mobile`,
+        `phone`,
+        `website`,
+        `capital`,
+        `offer`,
+        `status`,
+        `commend`,
+        `verify_note`,
+        `out_inquiry`,
+        `add_time`,
+        `admin`,
+        `mode2`,
+        `is_proxy`,
+        `is_address`,
+        `map`,
+        `circle_id`,
+        `logo`,
+        `salesman`,
+        `license`
+     FROM `cms_company` c  WHERE c.user_id=#{user_id}
+	</select>
+
+	
+	
+	<select id="queryCompanysById" resultType="com.jg2b.h5.pojo.CompanyPagePojo" parameterType="String">
+		select 
+		cy.company_id company_id,
+		cy.user_id user_id,
+		cy.company company,
+		cy.address address,
+		cy.commend commend,
+		cy.is_proxy is_proxy,
+		cy.is_address is_address,
+		cy.contacts contacts,
+		cu.mobile mobile 
+		from cms_company cy 
+		INNER JOIN cms_user cu 
+			on cy.user_id=cu.user_id
+		where 
+			cy.company_id =#{company_id}
+	</select>
+	
+
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.jg2b.seoBrand.dao.BrandKindDao">
+ 
+ 
+ <!-- 查询当前品牌下鲸工入驻的供应商数量 --> 
+<select id="queryBrandCount" resultType="int">
+	select count(f.brand_id) from 
+(
+  SELECT  
+      c.brand_id,c.brandUuid FROM
+	cms_brand c  where 
+	c.brandUuid =#{brandUuid}
+) f
+INNER JOIN cms_company_brand b ON b.brandUuid = f.brandUuid
+INNER JOIN (select p.companyUuid from cms_company p WHERE p.status=1) t ON b.companyUuid=t.companyUuid
+</select>
+<!-- 当前品牌已询价的次数（按单商品计算） -->
+<select id="queryInqueriedCounts"  resultType="int"> 
+SELECT
+	COUNT(1)
+FROM
+	cms_inquiry c
+INNER JOIN cms_i_goods g ON c.inquiryUuid = g.inquiryUuid
+INNER JOIN (
+	SELECT
+		b.brandUuid
+	FROM
+		cms_brand b
+	WHERE
+		b.brandUuid = #{brandUuid}) c  ON g.brandUuid = c.brandUuid
+</select>
+ <!-- 根据品牌id 查询 品牌描述 供应商Uuid --> 
+<select id="queryBrandDetails" resultType="com.jg2b.seoDto.BrandListDto">
+SELECT 
+ 	tcg.goodsUuid,
+	tcs.name,
+	ccb.companyUuid,
+	g.brand_name,
+	g.brand_logo,
+	g.infos
+FROM
+    (select cb.brandUuid,cb.infos,cb.brand_name,cb.brand_logo from cms_brand cb WHERE
+	cb.brandUuid =#{brandUuid}) g
+LEFT JOIN cms_company_brand ccb ON g.brandUuid = ccb.brandUuid
+LEFT JOIN t_cust_goods tcg ON tcg.brandUuid = g.brandUuid
+LEFT JOIN t_cust_sku tcs ON tcg.skuUuid = tcs.skuUuid
+ LIMIT 2	
+</select>
+<select id="queryCompany" resultType="com.jg2b.seoPojo.CompanyPojo">
+SELECT
+	company_id,
+	companyUuid,
+	user_id,
+	company,
+	address,
+	province,
+	city,
+	region,
+	email,
+	contacts,
+	mobile,
+	phone,
+	website,
+	capital,
+	offer,
+	status,
+	commend,
+	verify_note,
+	out_inquiry,
+	add_time,
+	admin,
+	mode2
+FROM
+	cms_company 
+WHERE
+	companyUuid = #{companyUuid} 
+</select>
+
+<select id="queryBrandByKind" resultType="com.jg2b.seoDto.BrandListDto">
+SELECT
+	brandUuid
+FROM
+	t_cust_brandKind
+WHERE
+	kindUuid = #{0} order by kindUuid  limit #{1},#{2}
+</select>
+
+
+<select id="queryTotalCounts" resultType="int">
+SELECT
+	count(1)
+FROM
+	t_cust_brandKind
+WHERE
+	kindUuid = #{kindUuid}
+</select>
+
+<!--根据供应商uuid 查询商品 两个  -->
+<select id="queryGoodsBycompanyUuid" resultType="com.jg2b.seoPojo.GoodsPojo">
+select tcs.name AS sku_name,tcg1.goodsUuid from (select tcg.companyUuid,tcg.skuUuid,tcg.goodsUuid from  t_cust_goods tcg where tcg.companyUuid =#{companyUuid}) tcg1
+LEFT JOIN t_cust_sku tcs ON tcs.skuUuid = tcg1.skuUuid 
+LIMIT 2
+</select>
+
+
+</mapper>

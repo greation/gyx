@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.customerManage.dao.ContactsDao">
+	<!-- 添加联系人 -->
+	 <insert id="insertContacts"  parameterType="com.jg2b.api.crm.customerManage.pojo.ContactsPojo">
+INSERT INTO T_CRM_Contacts (
+	GID,
+	OWNER,
+	NAME,
+	Creater,
+	Telphone,
+	CreateTime,
+	Deleted,
+	`Group`
+)
+VALUES
+	(
+		#{GID},#{owner},#{name},#{creater},#{telphone},#{createTime},0,#{group}) 
+	 </insert>
+	 
+	 <update id="updateContacts"  parameterType="com.jg2b.api.crm.customerManage.pojo.ContactsPojo">
+	update T_CRM_Contacts
+ set
+Name=#{name},Telphone=#{telphone},Title=#{title}
+    where ID = #{ID}
+	 </update>
+	 
+	 <select id="queryContactsInfo" resultType="com.jg2b.api.crm.customerManage.pojo.ContactsPojo">
+       SELECT Name,Gender,Telphone,Position FROM T_CRM_Contacts  where Owner = #{owner} and deleted = 0
+	</select>
+</mapper>

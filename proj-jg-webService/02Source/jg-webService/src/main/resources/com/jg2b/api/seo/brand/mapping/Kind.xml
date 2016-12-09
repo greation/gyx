@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.jg2b.seoBrand.dao.BrandKindDao">
+ <!-- 分类供应商 -->
+ <select id="queryCompanyUpKind"   resultType="com.jg2b.seoDto.CompanyDto">
+	SELECT p.companyUuid,p.company as "companyName",p.status,tcc.introduce as "introduces",tcc.businessScope FROM
+	(select k.kindUuid from t_cust_kind k WHERE k.kindUuid=#{0}) g
+	LEFT JOIN t_cust_brandKind b ON g.kindUuid=b.kindUuid
+	LEFT JOIN cms_brand d ON b.brandUuid=d.brandUuid
+	LEFT JOIN cms_company_brand a ON d.brandUuid=a.brandUuid
+	LEFT JOIN cms_company p ON a.companyUuid=p.companyUuid
+  LEFT JOIN  t_cust_companyIntroduce  tcc on tcc.companyUuid= p.companyUuid
+	 limit #{1},#{2}
+ </select>
+ 
+ <!-- 查询分类供应商总数 -->
+<select id ="queryCompanyUpKindCounts" parameterType="String" resultType="int">
+	SELECT count(1) FROM
+	(select k.kindUuid from t_cust_kind k WHERE k.kindUuid=#{0}) g
+	LEFT JOIN t_cust_brandKind b ON g.kindUuid=b.kindUuid
+	LEFT JOIN cms_brand d ON b.brandUuid=d.brandUuid
+	LEFT JOIN cms_company_brand a ON d.brandUuid=a.brandUuid
+	LEFT JOIN cms_company p ON a.companyUuid=p.companyUuid
+  LEFT JOIN  t_cust_companyIntroduce  tcc on tcc.companyUuid= p.companyUuid
+</select>
+ 
+ <!-- 分类商品（分页） -->
+<select id="queryKindGood" resultType="com.jg2b.seoDto.GoodsInfoDto">
+	SELECT g.goodsUuid, 
+           g.companyUuid,
+		   g.title,
+		   b.brand_name AS brand,
+		   k.name,
+		   k.size,
+		   k.skuUuid, 
+		   k.material,
+		   c.company,
+		   a.introduce,
+		   n.`goodsvalue`,
+		   g.`image`
+	FROM (SELECT * FROM t_cust_skuKind t WHERE t.kindUuid=#{kindUuid})s
+	INNER JOIN t_cust_goods g ON s.skuUuid=g.skuUuid 
+	INNER JOIN t_cust_sku k ON g.skuUuid=k.skuUuid 
+	INNER JOIN cms_brand b ON g.brandUuid=b.brandUuid 
+	INNER JOIN cms_company c ON g.companyUuid=c.companyUuid 
+	INNER JOIN  t_cust_companyIntroduce a ON c.companyUuid=a.companyUuid
+	INNER JOIN `t_cust_goodsInfo` n ON g.`goodsUuid`=n.`goodsUuid`
+	LIMIT #{startIndex},#{pageSize}
+</select>
+
+<!--查询当前分类 鲸工入驻的供应商数量 -->
+<select id="queryCompanyCountUdKingId" resultType="int">
+	SELECT
+	  COUNT(1)
+        FROM
+	  cms_company c
+	  INNER JOIN `cms_company_brand` ccb ON ccb.companyUuid = c.companyUuid 
+	  INNER JOIN cms_brand cb ON cb.brandUuid =  ccb.brandUuid  
+	  INNER JOIN `t_cust_brandKind` tcb ON tcb.brandUuid=cb.brandUuid
+	  INNER JOIN `t_cust_kind` tck ON tck.kindUuid =tcb.kindUuid
+	  AND tck.kindUuid=#{0} AND c.status=#{1} 
+</select>
+
+
+<!-- 当前分类 已询价的次数 -->
+<select id="queryInqueryUdKingId" resultType="int">
+	SELECT COUNT(1) FROM 
+        cms_i_goods g 
+		INNER JOIN cms_brand b ON g.brandUuid = b.brandUuid 
+		INNER JOIN `t_cust_brandKind` tcb ON tcb.brandUuid=b.`brandUuid` 
+		AND tcb.kindUuid =#{kindUuid} 
+</select>
+<!-- 当前分类 采集库中 供应商最多的3个品牌显示 -->
+<select id="queryCompanyListByKind"   resultType="com.jg2b.seoDto.KindCompanyDto">
+	SELECT b.`kindUuid`,
+		   d.`brandUuid`,
+		   d.`brand_name` brandName,
+		  d.`infos` 
+    FROM `t_cust_brandKind` b 
+    INNER JOIN  `cms_brand` d ON b.`brandUuid`=d.`brandUuid`
+    WHERE b.`kindUuid`=#{kindUuid} limit 3
+    </select>  
+<!-- 分类商品分页查询总数 --> 
+<select id="queryKindGoodCounts" resultType="int">
+SELECT COUNT(1)
+FROM (SELECT * FROM t_cust_skuKind t WHERE t.kindUuid=#{kindUuid})s
+INNER JOIN t_cust_goods g ON s.skuUuid=g.skuUuid 
+INNER JOIN t_cust_sku k ON g.skuUuid=k.skuUuid 
+INNER JOIN cms_brand b ON g.brandUuid=b.brandUuid 
+INNER JOIN cms_company c ON g.companyUuid=c.companyUuid 
+INNER JOIN  t_cust_companyIntroduce a ON c.companyUuid=a.companyUuid
+</select> 
+
+<select id="queryKindPojoByKindUuid" resultType="com.jg2b.seoPojo.KindPojo" parameterType="String">
+	SELECT
+		ID,
+		kindUuid,
+		name,
+		creator,
+		creatertime,
+		updator,
+		updatetime,
+		sources,
+		deleted,
+		parentId
+	FROM
+		t_cust_kind
+	WHERE 
+		kindUuid=#{kindUuid}
+		AND deleted=1
+</select> 
+
+      
+</mapper>

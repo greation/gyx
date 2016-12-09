@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jg2b.api.crm.traces.dao.ICommonTracesDAO">
+	<insert id="saveTracesPojoS" parameterType="java.util.List"> 
+		<![CDATA[
+		    insert into T_Common_Traces(ID,
+		    SubscriberType,
+		    SubscriberID,
+		    Action,
+		    `Fields`,
+		    `Before`,
+		    `After`,
+		    Creator,
+		    SerialNo,
+		    CreateTime,
+		    Deleted,
+		    GID) values 
+		]]>
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.ID},#{item.SubscriberType},#{item.SubscriberID},#{item.Action},#{item.Fields},#{item.Before},#{item.After},#{item.Creator},#{item.SerialNo},#{item.createTime},#{item.Deleted},#{item.GID})
+		</foreach>
+	</insert>
+</mapper>

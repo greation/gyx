@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.jg2b.seoBrand.dao.GoodsDao">
+ 	<!-- 根据goodsUuid查询商品属性列表 --> 
+	<select id="queryGoodsAttributesByUuid" parameterType="com.jg2b.seoPojo.GoodsInfoPojo" resultType="com.jg2b.seoPojo.GoodsInfoPojo">
+		SELECT 
+			id,
+			goodsUuid,
+			goodskey,
+			goodsvalue,
+			creator,
+			creatertime,
+			updator,
+			updatetime,
+			deleted,
+			sources
+		FROM	
+			t_cust_goodsInfo T
+		WHERE
+			T.goodsUuid=#{goodsUuid}
+			AND T.deleted=#{deleted}
+	</select>
+	<!-- 根据goodsUuid查询商品详细信息 --> 
+	<select id="queryGoodsByUuid" parameterType="com.jg2b.seoPojo.GoodsPojo" resultType="com.jg2b.seoPojo.GoodsPojo">
+		SELECT
+			G.id,
+			G.goodsUuid,
+			G.skuUuid,
+			G.companyUuid,
+			G.brandUuid,
+			G.factoryUuid,
+			G.title,
+			G.price,
+			G.creator,
+			G.creatertime,
+			G.updator,
+			G.updatetime,
+			G.sources,
+			G.deleted,
+			G.image,
+			B.brand_name,
+			S.name sku_name,
+			S.material,
+			S.size,
+			GS.goodsvalue,
+			IFNULL(C.is_customizing, 1) is_customizing,
+			CP.company company_name
+		FROM
+			(
+				SELECT
+					id,
+					goodsUuid,
+					skuUuid,
+					companyUuid,
+					brandUuid,
+					factoryUuid,
+					title,
+					price,
+					creator,
+					creatertime,
+					updator,
+					updatetime,
+					sources,
+					deleted,
+					image
+				FROM
+					t_cust_goods T
+				WHERE
+					T.goodsUuid = #{goodsUuid}
+					AND T.deleted=#{deleted}
+			) G
+			/**辨别关系是否存在*/
+			/**商品与skuUuid一一对应     kindUuid与skuUuid一对多*/
+			INNER JOIN t_cust_skuKind SK ON SK.skuUuid = G.skuUuid 
+			/**为保证数据能够输出并不受关联表的是否有效性影响，将deteted判断放在关联关系之后 而不是放在where条件之后*/
+			LEFT JOIN t_cust_sku S ON SK.skuUuid = S.skuUuid
+			AND S.deleted = 1
+			/**kindUuid与brandUuid多对多  商品上brandUuid唯一*/
+			INNER JOIN t_cust_brandKind BK ON SK.kindUuid = BK.kindUuid
+			AND BK.brandUuid = G.brandUuid
+			LEFT JOIN t_cust_goodsInfo GS ON GS.goodsUuid = G.goodsUuid
+			AND GS.deleted = 1
+			LEFT JOIN cms_brand B ON G.brandUuid = B.brandUuid
+			LEFT JOIN t_cust_companyIntroduce C ON G.companyUuid = C.companyUuid
+			AND C.deteted = 1
+			LEFT JOIN cms_company CP ON G.companyUuid = CP.companyUuid
+	</select>
+	
+	<!-- 分页查询商品详细信息 --> 
+	<select id="queryGoodsList" parameterType="com.jg2b.seoPojo.GoodsPojo" resultType="com.jg2b.seoPojo.GoodsPojo">
+		SELECT
+			T.id,
+			T.goodsUuid,
+			T.skuUuid,
+			T.companyUuid,
+			T.brandUuid,
+			T.factoryUuid,
+			T.title,
+			T.price,
+			T.creator,
+			T.creatertime,
+			T.updator,
+			T.updatetime,
+			T.sources,
+			T.deleted,
+			T.image,
+			B.brand_name,
+			S.name sku_name,
+			S.material,
+			S.size,
+			GS.goodsvalue,
+			IFNULL(C.is_customizing, 1) is_customizing,
+			CP.company company_name
+		FROM
+			(
+				SELECT 
+					id,
+					goodsUuid,
+					skuUuid,
+					companyUuid,
+					brandUuid,
+					factoryUuid,
+					title,
+					price,
+					creator,
+					creatertime,
+					updator,
+					updatetime,
+					sources,
+					deleted,
+					image
+				FROM	
+					t_cust_goods G
+				<where>
+					1=1
+					AND G.deleted=1
+					<if test="goodsPojo.deleted != null and goodsPojo.deleted !='' ">
+		           		AND G.deleted=#{goodsPojo.deleted}
+		        	</if>
+					<if test="goodsPojo.skuUuid != null and goodsPojo.skuUuid !='' ">
+		           		and G.skuUuid=#{goodsPojo.skuUuid}
+		        	</if>
+					<if test="goodsPojo.companyUuid != null and goodsPojo.companyUuid !='' ">
+		           		and G.companyUuid=#{goodsPojo.companyUuid}
+		        	</if>	
+					<if test="goodsPojo.brandUuid != null and goodsPojo.brandUuid !='' ">
+		           		and G.brandUuid=#{goodsPojo.brandUuid}
+		        	</if>
+		        	<if test="goodsPojo.factoryUuid != null and goodsPojo.factoryUuid !='' ">
+		           		and G.factoryUuid=#{goodsPojo.factoryUuid}
+		        	</if>
+				</where>
+				LIMIT #{startIndex},#{rowNum}
+			) T
+			/**辨别关系是否存在*/
+			/**商品与skuUuid一一对应     kindUuid与skuUuid一对多*/
+			INNER JOIN t_cust_skuKind SK ON SK.skuUuid = T.skuUuid 
+			/**为保证数据能够输出并不受关联表的是否有效性影响，将deteted判断放在关联关系之后 而不是放在where条件之后*/
+			LEFT JOIN t_cust_sku S ON SK.skuUuid = S.skuUuid
+			AND S.deleted = 1
+			/**kindUuid与brandUuid多对多  商品上brandUuid唯一*/
+			INNER JOIN t_cust_brandKind BK ON SK.kindUuid = BK.kindUuid
+			AND BK.brandUuid = T.brandUuid
+			LEFT JOIN t_cust_goodsInfo GS ON GS.goodsUuid = T.goodsUuid
+			AND GS.deleted = 1
+			LEFT JOIN cms_brand B ON T.brandUuid = B.brandUuid
+			LEFT JOIN t_cust_companyIntroduce C ON T.companyUuid = C.companyUuid
+			AND C.deteted = 1
+			LEFT JOIN cms_company CP ON T.companyUuid = CP.companyUuid
+	</select>
+	
+<!-- 根据供应商id查询产品id，名称，图片信息 -->
+<select id="queryGoodsByCompanyId" resultType="com.jg2b.seoPojo.QueryGoodsByCompanyPojo" parameterType="String">
+SELECT
+	goods.goodsUuid,
+	goods.image,
+	tcs1.`name`
+FROM
+	(
+		SELECT
+			t.goodsUuid,
+			t.skuUuid,
+			t.image
+		FROM
+			t_cust_goods t
+		WHERE
+			t.companyUuid = #{companyUuid} and t.deleted=1
+	) goods
+INNER JOIN  (select tcg.goodsUuid from t_cust_goodsInfo tcg  where tcg.deleted=1)  tcg1  ON tcg1.goodsUuid = goods.goodsUuid
+INNER JOIN (select tcs.skuUuid,tcs.`name` from t_cust_sku tcs where tcs.deleted=1) tcs1 ON goods.skuUuid = tcs1.skuUuid
+limit 2
+</select>
+</mapper>

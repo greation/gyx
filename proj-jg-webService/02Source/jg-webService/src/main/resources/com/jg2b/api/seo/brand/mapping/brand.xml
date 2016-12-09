@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.jg2b.seoBrand.dao.BrandDao">
+ 
+ 
+<!-- 查询当前品牌下鲸工入驻的供应商数量 --> 
+<select id="queryBrandCount" resultType="int">
+ 	 SELECT  
+      COUNT(1) FROM
+	cms_brand c
+INNER JOIN cms_company_brand b ON b.brandUuid = c.brandUuid
+INNER JOIN cms_company p ON b.companyUuid=p.companyUuid
+WHERE p.status=1 AND
+	c.brandUuid =#{brandUuid}
+</select>
+<!-- 当前品牌已询价的次数（按单商品计算） -->
+<select id="queryInqueriedCounts"  resultType="int"> 
+SELECT
+	COUNT(1)
+FROM
+	cms_inquiry c
+INNER JOIN cms_i_goods g ON c.inquiryUuid = g.inquiryUuid
+INNER JOIN cms_brand b ON g.brandUuid = b.brandUuid
+WHERE
+	b.brandUuid =#{brandUuid}
+</select>
+<!-- 	 查询当前品牌的品牌介绍 -->
+<select id="queryBrandInfos" resultType="com.jg2b.seoPojo.BrandPojo">
+SELECT
+	brand_name,
+	brand_logo,
+	first_letter,
+	pinyin,
+	companys,
+	keywords,
+	infos,
+	recommend
+FROM
+	cms_brand
+WHERE
+	brandUuid = #{brandUuid}
+</select>
+<!-- 根据 BrandUuid 查询品牌信息-->
+<select id="queryBrandInfoByBrandUuid" resultType="com.jg2b.seoPojo.BrandPojo">
+SELECT
+	brand_name,
+	brand_logo,
+	first_letter,
+	pinyin,
+	companys,
+	keywords,
+	infos,
+	recommend
+FROM
+	cms_brand
+WHERE
+	brandUuid = #{brandUuid}
+</select>
+	
+<!-- 查询当前供应商旗下七个经营品牌 -->	
+<select id="queryCompayUpBrand7"  resultType="com.jg2b.seoPojo.BrandPojo">
+SELECT DISTINCT
+        b.brandUuid,
+	b.brand_name
+FROM
+	cms_company c
+INNER JOIN cms_company_brand o ON c.companyUuid = o.companyUuid
+INNER JOIN cms_brand b ON o.brandUuid = b.brandUuid
+WHERE
+	c.companyUuid = #{companyUuid}
+LIMIT 7
+</select>
+<!-- 查询当前供应商介绍信息 -->	
+<select id="queryCompanyIntroduce"   parameterType="com.jg2b.seoPojo.CompanyIntroducePojo"   resultType="com.jg2b.seoPojo.CompanyIntroducePojo">
+SELECT
+	o.introduce,
+	o.`companyId`,
+	o.`companyUuid`,
+	o.`createtime`,
+	o.`creator`,
+	o.`deteted`,
+	o.`ID`,o.`managementModel`,
+	o.`updatetime`,
+	o.`updator`,
+	o.businessScope
+FROM
+	cms_company c
+INNER JOIN t_cust_companyIntroduce o ON c.companyUuid = o.companyUuid
+WHERE
+	c.companyUuid = #{companyUuid}
+</select>
+
+
+<!-- 查询当前品牌下的所有供应商 -->
+<select id="queryCompanysBybranId"    resultType="com.jg2b.seoPojo.CompanyPojo">
+SELECT
+	c.company,
+	c.companyUuid
+FROM
+	cms_company c
+INNER JOIN cms_company_brand o ON c.companyUuid = o.companyUuid
+AND o.brandUuid=#{0}
+INNER JOIN cms_brand b ON o.brandUuid = b.brandUuid
+ORDER BY c.companyUuid
+LIMIT #{1},
+ #{2}
+</select>
+<!-- 查询当前品牌下的所有供应商数量 -->
+<select id ="queryComanyTotalCountsByBrandId" parameterType="String" resultType="int">
+SELECT
+	COUNT(1)
+FROM
+	cms_company c
+INNER JOIN cms_company_brand o ON c.companyUuid = o.companyUuid
+INNER JOIN cms_brand b ON o.brandUuid = b.brandUuid
+WHERE
+	b.brandUuid =#{brandUuid}
+</select>
+<!-- 查询当前sku的属性 商品属性 供应商介绍 -->
+<select id ="querySkuDetails" parameterType="String" resultType="com.jg2b.seoDto.GoodsInfoDto">
+SELECT
+	tcg.title,
+	tcc.introduce,
+	tcs.skuUuid,
+	tcs.name,
+	tcs.size,
+	tcs.unit,
+	tcs.number,
+	tcs.material,
+	g.`goodsvalue`,
+	i.`skuvalue`
+FROM
+	t_cust_goods tcg
+LEFT JOIN t_cust_sku tcs ON tcs.skuUuid = tcg.skuUuid
+LEFT JOIN t_cust_companyIntroduce tcc ON tcg.companyUuid = tcc.companyUuid
+LEFT JOIN `t_cust_goodsInfo` g ON tcg.`goodsUuid`=g.`goodsUuid`
+LEFT JOIN `t_cust_skuInfo` i ON tcs.`skuUuid`=i.`skuUuid`
+WHERE
+	tcg.goodsUuid =#{goodsUuid}
+
+</select>
+<!--查询skuinfo key value  -->
+<select id ="querySkuInfo" parameterType="String" resultType="com.jg2b.seoPojo.SkuInfoPojo">
+SELECT
+tcs.skukey,tcs.skuvalue
+
+FROM
+	t_cust_skuInfo tcs
+WHERE
+tcs.skuUuid = #{skuUuid}
+
+</select>
+<!--  查询同类商品-->
+<select id ="querySimilarGoods" parameterType="String" resultType="com.jg2b.seoDto.GoodDto">
+
+SELECT
+	cc.companyUuid,
+	tcg.goodsUuid,
+	cb.brandUuid,
+	tcg.title,
+	tcs.skuUuid,
+	tcs. NAME,
+	tcg.image,
+	tcs.unit,
+	tcs.number,
+	tcs.material,
+	cc.company,
+	cb.brand_name brandName,
+	tcgi.goodsvalue ,
+	tcsi.skuvalue
+FROM
+	(
+		SELECT
+			tcg1.goodsUuid,tcg1.title,tcg1.skuUuid,tcg1.brandUuid,tcg1.image
+		FROM
+			t_cust_goods tcg1
+		WHERE
+			tcg1.goodsUuid = #{goodsUuid}
+	) tcg
+LEFT JOIN t_cust_sku tcs ON tcs.skuUuid = tcg.skuUuid
+LEFT JOIN cms_brand cb ON cb.brandUuid = tcg.brandUuid
+LEFT JOIN cms_company_brand ccb ON ccb.brandUuid = tcg.brandUuid
+LEFT JOIN cms_company cc ON cc.companyUuid = ccb.companyUuid
+LEFT JOIN t_cust_skuInfo tcsi ON tcsi.skuUuid = tcs.skuUuid
+LEFT JOIN t_cust_goodsInfo tcgi ON tcgi.goodsUuid = tcg.goodsUuid
+
+</select>
+
+
+<!-- 查询goodsInfo key value -->
+<select id ="queryGoodsInfo" parameterType="String" resultType="com.jg2b.seoPojo.GoodsInfoPojo">
+SELECT
+tcg.goodskey,tcg.goodsvalue
+
+FROM
+	t_cust_goodsInfo tcg
+WHERE
+tcg.goodsUuid = #{goodsUuid}
+</select>
+
+<!-- 查询当前品牌下的所有商品 -->
+<select id="queryGoodsUpBrandId" resultType="com.jg2b.seoDto.GoodDto">
+SELECT
+	b.brandUuid AS brandUuid,
+	g.goodsUuid AS goodsUuid,
+	g.title AS title,
+	b.brand_name AS brandName ,
+	s.name AS name,
+	s.size AS size,
+	s.material AS material,
+	s.skuUuid AS skuUuid,
+	g.companyUuid AS companyUuid,
+	cc.company as company,
+tcsi.skukey,
+tcsi.skuvalue,
+tcgi.goodskey,
+tcgi.goodsvalue
+FROM
+	cms_brand b
+LEFT JOIN t_cust_goods g ON g.brandUuid = b.brandUuid
+LEFT  JOIN t_cust_sku s ON g.skuUuid = s.skuUuid
+LEFT  JOIN cms_company cc On cc.companyUuid = g.companyUuid
+LEFT JOIN t_cust_skuInfo tcsi ON tcsi.skuUuid = s.skuUuid
+LEFT JOIN t_cust_goodsInfo tcgi ON tcgi.goodsUuid = g.goodsUuid
+WHERE
+	b.brandUuid = #{0}
+	ORDER BY s.skuUuid
+	LIMIT #{1},
+ #{2}
+</select>
+
+
+<!-- 查询当前品牌下的所有商品数量 -->
+<select id="queryGoodsUuidByKindUuid" resultType="com.jg2b.seoDto.GoodDto">
+SELECT
+	tcg.goodsUuid
+FROM
+	t_cust_goods tcg
+LEFT JOIN (
+	SELECT
+		tcb.brandUuid
+	FROM
+		t_cust_brandKind tcb
+	WHERE
+		tcb.kindUuid = #{kindUuid}
+) tcb1 ON tcb1.brandUuid = tcg.brandUuid
+ORDER BY
+	tcg.ID
+LIMIT 10
+
+</select>
+
+<!-- 查询当前品牌下的所有商品数量 -->
+<select id="queryGoodsUpBrandIdCount" resultType="int">
+SELECT
+	count(1)
+FROM
+	cms_brand b
+INNER JOIN t_cust_goods g ON g.brandUuid = b.brandUuid
+INNER JOIN t_cust_sku s ON g.skuUuid = s.skuUuid
+WHERE
+	b.brandUuid = #{brandUuid}
+</select>
+
+<!-- 根据skuId查询当前商品的skuInfo信息 -->
+<select id="querySkuInfoBySkuId" resultType="com.jg2b.seoPojo.SkuInfoPojo">
+SELECT
+	k.skukey,
+k.skuvalue
+FROM
+	t_cust_skuInfo k
+WHERE
+	k.skuUuid = #{skuUuid} 
+</select>
+
+<!--根据工厂id查询当前商品所属厂家信息  -->
+<select  id="queryFactory" resultType="com.jg2b.seoPojo.FactoryPojo">
+SELECT
+	t.name,
+	t.ID,
+	t.factoryUuid,
+	t.address,
+	t.creator,
+	t.creatertime,
+	t.updator,
+	t.updatetime,
+	vdeleted,
+	t.sources
+	
+FROM
+	t_cust_factory t
+WHERE
+	t.factoryUuid = #{factoryUuid}
+</select>
+
+
+<!-- 根据goodsUuid查询 所在类目 -->
+<select  id="querySameKindNum" resultType="String">
+SELECT
+	tck.kindUuid
+FROM
+	t_cust_kind tck
+LEFT JOIN t_cust_skuKind tcs ON tcs.kindUuid = tck.kindUuid
+LEFT JOIN t_cust_goods tcg ON tcg.skuUuid = tcs.skuUuid
+WHERE
+	tcg.goodsUuid =#{goodsUuid}
+</select>
+	<!-- 分页查询品牌信息 -->
+	<select id="queryBrandsList"  parameterType="com.jg2b.seoPojo.BrandPojo" resultType="com.jg2b.seoPojo.BrandPojo">
+		SELECT 
+			brand_id,
+			brandUuid,
+			brand_name,
+			brand_logo,
+			first_letter,
+			pinyin,
+			companys,
+			keywords,
+			infos,
+			STATUS,
+			recommend,
+			sorts,
+			admin
+		FROM
+			cms_brand
+				LIMIT #{1},
+		 		#{2}
+	</select>
+<!-- 根据skuUuid查询当前商品的skuInfo信息 -->
+<select  id="querySkuInfoBySkuUuid" resultType="com.jg2b.seoPojo.SkuInfoPojo">
+SELECT
+	k.skukey,
+k.skuvalue
+FROM
+	t_cust_skuInfo k
+WHERE
+	k.skuUuid = #{skuUuid} 
+</select>
+
+<!--根据品牌查询同类供应商信息 (已经入驻) -->
+<select id="queryCompanyUpBrandId" resultType="com.jg2b.seoDto.CompanyDto">
+	 SELECT
+	o.companyUuid,
+	o.company AS companyName
+FROM
+	cms_brand b
+INNER JOIN cms_company_brand n ON b.brandUuid = n.brandUuid
+INNER JOIN cms_company o ON n.companyUuid = o.companyUuid
+WHERE o.status=1
+AND
+	b.brandUuid = #{brandUuid}  limit 5
+</select>
+<!--商品—侧边公共栏相关类别  -->
+<select id="queryKingPojo12UpGoods" resultType="com.jg2b.seoPojo.KindPojo">
+	SELECT
+		kindUuid,
+		NAME,
+		creator,
+		creatertime,
+		updator,
+		updatetime,
+		sources,
+		deleted,
+		parentId
+	FROM
+		t_cust_kind
+	LIMIT 0,
+	 12
+</select>
+
+<!--根据品牌查询同类供应商信息 (未入驻) -->
+<select id="queryUnCompanyUpBrandId" resultType="com.jg2b.seoDto.CompanyDto">
+ SELECT
+	o.companyUuid,
+	o.company AS companyName 
+FROM
+	cms_brand b
+INNER JOIN cms_company_brand n ON b.brandUuid = n.brandUuid
+INNER JOIN cms_company o ON n.companyUuid = o.companyUuid
+WHERE o.status=0
+AND
+	b.brandUuid = #{brandId} limit 5
+</select>
+
+</mapper>

@@ -1,0 +1,90 @@
+.login-box {
+    height: 400px;
+    /* margin: 40px auto 40px 250px; */
+    margin:0 auto;
+    max-width: 500px;
+    /* position: absolute; */
+    width: 100%;
+}
+.login-title {
+    background-color: #FFFFFF;
+    padding: 20px 10px;
+    margin-top: 10%;
+}
+.text-center {
+    text-align: center;
+}
+.login-content {
+    background-color: rgba(255, 250, 255, 0.6);
+    float: left;
+    height: 300px;
+    max-width: 500px;
+    width: 100%;
+}
+.login-title h1 {
+    margin-top: 10px !important;
+}
+.login-title small {
+    color: #0074C1;
+    font-weight: bold;
+}
+.form {
+    height: 275px;
+    margin: 25px auto 0;
+    max-width: 500px;
+    padding-top: 25px;
+    width: 100%;
+}
+.form-group {
+    margin-bottom: 0 !important;
+}
+.form-control, .input-group {
+    height: 40px;
+}
+.input-group {
+    margin: 0 0 30px !important;
+}
+
+.link p {
+    line-height: 20px;
+    margin-top: 30px;
+}
+
+.btn-sm {
+    font-size: 16px !important;
+    padding: 8px 24px !important;
+}
+
+.btn-info{
+	background-color:#0074C1;
+	border: 1px solid #0074C1;
+}
+
+header {
+    background-image: url("../img/header-bg.jpg");
+    text-align: center; 
+}
+
+
+
+
+@media (max-width:767px) {
+	.login-box {
+    height: 400px;
+    margin: 40px auto;
+    max-width: 500px;
+    position: absolute;
+    width: 100%;
+}
+}
+
+
+
+
+
+
+
+
+
+
+
